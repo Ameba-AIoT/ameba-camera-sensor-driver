@@ -1,0 +1,109 @@
+#ifndef _ISP_REG_YSTAT_H_INC_
+#define _ISP_REG_YSTAT_H_INC_
+
+#include <isp_reg.h>
+#include <isp_reg_base.h>
+
+#define YSTAT_CTRL (YSTAT_REG_BASE + 0x0000)
+#define YSTAT_WIN_START (YSTAT_REG_BASE + 0x0004)
+#define YSTAT_WIN_SIZE (YSTAT_REG_BASE + 0x0008)
+#define YSTAT_WIN_CAL_NUM (YSTAT_REG_BASE + 0x000C)
+#define YSTAT_HWIN_START (YSTAT_REG_BASE + 0x0010)
+#define YSTAT_HWIN_END (YSTAT_REG_BASE + 0x0014)
+#define YSTAT_YWIN_START (YSTAT_REG_BASE + 0x0018)
+#define YSTAT_YWIN_END (YSTAT_REG_BASE + 0x001C)
+#define YSTAT_YSUM (YSTAT_REG_BASE + 0x0020)
+#define YSTAT_ADDR (YSTAT_REG_BASE + 0x0024)
+#define YSTAT_WIN_RESULT (YSTAT_REG_BASE + 0x0028)
+#define YSTAT_HISTO_RESULT (YSTAT_REG_BASE + 0x002C)
+
+/* YSTAT_CTRL 0x0000 */
+#define YUV_STATS_MODE_OFFSET 0
+#define YUV_STATS_MODE_BITS 2
+#define YUV_STATS_MODE_MASK (((1 << 2) - 1) << 0)
+#define YUV_STATS_DLY_OFFSET 2
+#define YUV_STATS_DLY_BITS 2
+#define YUV_STATS_DLY_MASK (((1 << 2) - 1) << 2)
+#define WIN_STATS_MODE_OFFSET 4
+#define WIN_STATS_MODE_BITS 1
+#define WIN_STATS_MODE_MASK (((1 << 1) - 1) << 4)
+#define YUV_STATS_GOING_OFFSET 5
+#define YUV_STATS_GOING_BITS 1
+#define YUV_STATS_GOING_MASK (((1 << 1) - 1) << 5)
+#define YUV_STATS_STOP_OFFSET 6
+#define YUV_STATS_STOP_BITS 1
+#define YUV_STATS_STOP_MASK (((1 << 1) - 1) << 6)
+#define YUV_STATS_START_OFFSET 7
+#define YUV_STATS_START_BITS 1
+#define YUV_STATS_START_MASK (((1 << 1) - 1) << 7)
+/* YSTAT_WIN_START 0x0004 */
+#define YUV_STATS_START_X_OFFSET 0
+#define YUV_STATS_START_X_BITS 12
+#define YUV_STATS_START_X_MASK (((1 << 12) - 1) << 0)
+#define YUV_STATS_START_Y_OFFSET 16
+#define YUV_STATS_START_Y_BITS 12
+#define YUV_STATS_START_Y_MASK (((1 << 12) - 1) << 16)
+/* YSTAT_WIN_SIZE 0x0008 */
+#define WIN_WIDTH_OFFSET 0
+#define WIN_WIDTH_BITS 8
+#define WIN_WIDTH_MASK (((1 << 8) - 1) << 0)
+#define WIN_HEIGHT_OFFSET 8
+#define WIN_HEIGHT_BITS 8
+#define WIN_HEIGHT_MASK (((1 << 8) - 1) << 8)
+#define WIN_NUM_H_OFFSET 16
+#define WIN_NUM_H_BITS 5
+#define WIN_NUM_H_MASK (((1 << 5) - 1) << 16)
+#define WIN_NUM_V_OFFSET 24
+#define WIN_NUM_V_BITS 5
+#define WIN_NUM_V_MASK (((1 << 5) - 1) << 24)
+/* YSTAT_WIN_CAL_NUM 0x000C */
+#define WIN_CAL_NUM_OFFSET 0
+#define WIN_CAL_NUM_BITS 12
+#define WIN_CAL_NUM_MASK (((1 << 12) - 1) << 0)
+/* YSTAT_HWIN_START 0x0010 */
+#define YUV_STATS_YST_X_OFFSET 0
+#define YUV_STATS_YST_X_BITS 12
+#define YUV_STATS_YST_X_MASK (((1 << 12) - 1) << 0)
+#define YUV_STATS_YST_Y_OFFSET 16
+#define YUV_STATS_YST_Y_BITS 12
+#define YUV_STATS_YST_Y_MASK (((1 << 12) - 1) << 16)
+/* YSTAT_HWIN_END 0x0014 */
+#define YUV_STATS_END_X_OFFSET 0
+#define YUV_STATS_END_X_BITS 12
+#define YUV_STATS_END_X_MASK (((1 << 12) - 1) << 0)
+#define YUV_STATS_END_Y_OFFSET 16
+#define YUV_STATS_END_Y_BITS 12
+#define YUV_STATS_END_Y_MASK (((1 << 12) - 1) << 16)
+/* YSTAT_YWIN_START 0x0018 */
+#define YSTA_X_OFFSET 0
+#define YSTA_X_BITS 12
+#define YSTA_X_MASK (((1 << 12) - 1) << 0)
+#define YSTA_Y_OFFSET 16
+#define YSTA_Y_BITS 12
+#define YSTA_Y_MASK (((1 << 12) - 1) << 16)
+/* YSTAT_YWIN_END 0x001C */
+#define YEND_X_OFFSET 0
+#define YEND_X_BITS 12
+#define YEND_X_MASK (((1 << 12) - 1) << 0)
+#define YEND_Y_OFFSET 16
+#define YEND_Y_BITS 12
+#define YEND_Y_MASK (((1 << 12) - 1) << 16)
+/* YSTAT_YSUM 0x0020 */
+#define YSUM_OFFSET 0
+#define YSUM_BITS 29
+#define YSUM_MASK (((1 << 29) - 1) << 0)
+/* YSTAT_ADDR 0x0024 */
+#define YUV_STATS_ADDR_OFFSET 0
+#define YUV_STATS_ADDR_BITS 9
+#define YUV_STATS_ADDR_MASK (((1 << 9) - 1) << 0)
+/* YSTAT_WIN_RESULT 0x0028 */
+#define WIN_RESULT_OFFSET 0
+#define WIN_RESULT_BITS 22
+#define WIN_RESULT_MASK (((1 << 22) - 1) << 0)
+/* YSTAT_HISTO_RESULT 0x002C */
+#define HISTO_RESULT_OFFSET 0
+#define HISTO_RESULT_BITS 19
+#define HISTO_RESULT_MASK (((1 << 19) - 1) << 0)
+
+#endif /* _ISP_REG_YSTAT_H_INC_ */
+

@@ -1,0 +1,24 @@
+/*
+ * Realtek Semiconductor Corp.
+ *
+ * ../../../../include/uapi/linux/rts_camera_jpgenc.h
+ *
+ * Copyright (C) 2014      Ming Qian<ming_qian@realsil.com.cn>
+ */
+#ifndef _U_RTS_CAMERA_JPGENC_H
+#define _U_RTS_CAMERA_JPGENC_H
+
+#define RTSJPGENC_IOC_MAGIC	'j'
+
+#define RTSJPGENC_IOCGHWOFFSET		_IOCTL_IOR(RTSJPGENC_IOC_MAGIC, 1, unsigned long *)
+#define RTSJPGENC_IOCGHWIOSIZE		_IOCTL_IOR(RTSJPGENC_IOC_MAGIC, 2, unsigned int *)
+#define RTSJPGENC_IOCHWRESET		_IOCTL_IO(RTSJPGENC_IOC_MAGIC, 3)
+#define RTSJPGENC_IOCDONE		_IOCTL_IO(RTSJPGENC_IOC_MAGIC, 4)
+#define RTSJPGENC_IOC_ENABLE		_IOCTL_IO(RTSJPGENC_IOC_MAGIC, 5)
+#define RTSJPGENC_IOC_DISABLE		_IOCTL_IO(RTSJPGENC_IOC_MAGIC, 6)
+#define RTSJPGENC_IOC_SETIME            _IOCTL_IO(RTSJPGENC_IOC_MAGIC, 7)
+#define RTSJPGENC_IOC_GETIMEBUF         _IOCTL_IO(RTSJPGENC_IOC_MAGIC, 8)
+
+#define RTSJPGENC_IOC_MAXNR	8
+
+#endif

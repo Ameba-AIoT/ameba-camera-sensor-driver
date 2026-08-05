@@ -1,0 +1,123 @@
+{
+  "IsLib": "N",
+  
+
+  
+  
+  "DisableOnNoSecure": "N",
+
+  "SecureDep": [
+    "NonSecure",
+    "Ignore"
+  ],
+  
+  "ChipVersionDep": [
+    "Cut-A",
+    "Cut-B",
+    "Cut-C",
+    "Cut-D"
+  ],
+  
+  
+ 
+  
+  "BuildModeDep": [
+    "Ram",
+    "All"
+  ],
+
+  "TargetDep": [
+    "rtl8735b"
+  ],
+
+
+  "extraIncludes": [
+  ],
+
+  "extraCCFlags": [
+    "-DCTBRC_STRENGTH",
+    "-Wno-format -Wno-implicit-function-declaration",
+    "-DTB_DEFINED_COMMENT",
+	"-DRTOS_FREERTOS",
+	"-DCONFIG_RTS3915",
+	"-l3A",
+	"-lOSD2"		  	      
+  ],
+  
+  "excludePath": [
+    "hal/rtl8735b/verify/isp",
+    "hal/rtl8735b/verify/sw_isp/drv/i2c",
+    "hal/rtl8735b/verify/sw_isp/drv/mtd/uboot",
+    "hal/rtl8735b/verify/sw_isp/drv/bsp"
+     
+  ],
+
+  "excludeIncludes": [
+    "hal/rtl8735b/verify/isp/include/common",
+    "hal/rtl8735b/verify/isp/osd/ewl",  
+    "hal/rtl8735b/verify/isp/hw_include/api",      
+    "hal/rtl8735b/verify/isp/include",      
+    "hal/rtl8735b/verify/isp/hw_include/regs",
+    "hal/rtl8735b/verify/isp/hw_include/regs/rts3915",    
+    "hal/rtl8735b/verify/isp/md_include",    
+    "hal/rtl8735b/verify/isp/osd/include",
+    "hal/rtl8735b/verify/isp/dr_include",    
+    "hal/rtl8735b/verify/isp/include/api",
+    "hal/rtl8735b/verify/isp"  
+  ],
+
+  "excludeSource": [
+
+      
+  ],
+  "obj_copy": [
+
+  ],
+
+  "PlatformCfg": {
+    "CONFIG_VERIFY_VIDEO": {
+      "0" : {		
+	    "Value": 0,
+	    "excludePath": [	    	
+		    "drv",
+		    "lib",
+		    "rtstream",
+		    "share",
+		    "sys"	
+        ],
+        "excludeIncludes": [
+		    "drv",
+		    "lib",
+		    "rtstream",
+		    "share",
+		    "sys"	
+        ],        
+        "excludeSource": [
+           "hal_isp.c"          
+        ],
+        "LinkLibs": [
+           "lib3A.a"
+        ]
+
+      }      
+    } 
+  }, 
+  "PlatformCfgDep": {
+    "CONFIG_ISP_EN": 1
+  },
+
+
+  "rtl8735b": {
+    "SecureDep": [
+      "NonSecure",
+      "Ignore"
+    ]    
+  },
+  
+  "ARMCC-v5": {
+    "CCFlags": [
+      "--gnu"
+	]
+  }
+
+}

@@ -1,0 +1,6 @@
+* long_names:false proto3_singular_msgs:true mangle_names:M_FLATTEN
+
+*.* type:FT_CALLBACK
+isp_statis_t.* type:FT_DEFAULT
+isp_statis_t.frame_count type:FT_CALLBACK
+isp_statis_ae_t.hdr type:FT_DEFAULT max_count:2 fixed_count:true

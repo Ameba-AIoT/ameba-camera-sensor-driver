@@ -1,0 +1,194 @@
+/*
+ * Realtek Semiconductor Corp.
+ *
+ * rts_camera_soc.h
+ *
+ * Copyright (C) 2014      Ming Qian<ming_qian@realsil.com.cn>
+ */
+#ifndef _UAPI_RTS_CAMERA_SOC_H
+#define _UAPI_RTS_CAMERA_SOC_H
+
+#include <v4l2-osdep.h>
+
+#define RTSCAM_SOC_VIDEO_YUV_NR_B               51
+#define RTSCAM_SOC_VIDEO_RGB_NR_B               (RTSCAM_SOC_VIDEO_YUV_NR_B + 10)
+
+#define RTSCAM_SOC_LDC_INDEX			6
+
+#define RTSCAM_SOC_MAX_SLOT_NUM			4
+
+#define RTSCAM_SOC_MIN_W			80
+#define RTSCAM_SOC_MIN_H			60
+
+#define RTSCAM_SOC_FRAME_HEADER_LENGTH		8
+
+#define RTSCAM_SOC_ISP_FUNC_LDC_BIT		1
+
+#define RTSCAM_SOC_DROP_FRAMES_THRESHOLD	8
+
+#define RTS_CMDCODE_GET_DYNAMIC_FPS		((0x0a << 8) | 0x95)
+
+
+/* A.1 Descriptor Types */
+#define RTSCAM_SOC_UNDEFINED_TYPE				0x0
+#define RTSCAM_SOC_DEVICE_TYPE					0x1
+#define RTSCAM_SOC_VS_INTERFACE_TYPE				0x2
+#define RTSCAM_SOC_ISP_PROCESSING_TYPE				0x3
+#define RTSCAM_SOC_CAMERA_TYPE					0x4
+#define RTSCAM_SOC_RTK_EXT_CTL_TYPE				0x5
+#define RTSCAM_SOC_HCLK_CFG_TYPE				0x6
+
+/* A.2 Video Stream Data Types */
+#define RTSCAM_SOC_VS_UNDEFINED					0x0
+#define RTSCAM_SOC_VS_FORMAT_UNCOMPRESSED			0x4
+#define RTSCAM_SOC_VS_FRAME_UNCOMPRESSED			0x5
+#define RTSCAM_SOC_VS_FORMAT_MJPEG				0x6
+#define RTSCAM_SOC_VS_FRAME_MJPEG				0x7
+#define RTSCAM_SOC_VS_FORMAT_H264				0x13
+#define RTSCAM_SOC_VS_FRAME_H264				0x14
+
+/* A.4 ISP Processing Control Selectors */
+#define RTSCAM_SOC_PU_CONTROL_UNDEFINED				0x00
+#define RTSCAM_SOC_PU_BACKLIGHT_COMPENSATION_CONTROL		0x01
+#define RTSCAM_SOC_PU_BRIGHTNESS_CONTROL			0x02
+#define RTSCAM_SOC_PU_CONTRAST_CONTROL				0x03
+#define RTSCAM_SOC_PU_GAIN_CONTROL				0x04
+#define RTSCAM_SOC_PU_POWER_LINE_FREQUENCY_CONTROL		0x05
+#define RTSCAM_SOC_PU_HUE_CONTROL				0x06
+#define RTSCAM_SOC_PU_SATURATION_CONTROL			0x07
+#define RTSCAM_SOC_PU_SHARPNESS_CONTROL				0x08
+#define RTSCAM_SOC_PU_GAMMA_CONTROL				0x09
+#define RTSCAM_SOC_PU_WHITE_BALANCE_TEMPERATURE_CONTROL		0x0A
+#define RTSCAM_SOC_PU_WHITE_BALANCE_TEMPERATURE_AUTO_CONTROL	0x0B
+#define RTSCAM_SOC_PU_WHITE_BALANCE_COMPONENT_CONTROL		0x0C
+#define RTSCAM_SOC_PU_WHITE_BALANCE_COMPONENT_AUTO_CONTROL	0x0D
+#define RTSCAM_SOC_PU_DIGITAL_MULTIPLIER_CONTROL		0x0E
+#define RTSCAM_SOC_PU_DIGITAL_MULTIPLIER_LIMIT_CONTROL		0x0F
+#define RTSCAM_SOC_PU_HUE_AUTO_CONTROL				0x10
+#define RTSCAM_SOC_PU_ANALOG_VIDEO_STANDARD_CONTROL		0x11
+#define RTSCAM_SOC_PU_ANALOG_LOCK_STATUS_CONTROL		0x12
+#define RTSCAM_SOC_PU_CONTRAST_AUTO_CONTROL			0x13
+
+/* A.4 Camera Control Selectors */
+#define RTSCAM_SOC_CT_CONTROL_UNDEFINED				0x00
+#define RTSCAM_SOC_CT_SCANNING_MODE_CONTROL			0x01
+#define RTSCAM_SOC_CT_AE_MODE_CONTROL				0x02
+#define RTSCAM_SOC_CT_AE_PRIORITY_CONTROL			0x03
+#define RTSCAM_SOC_CT_EXPOSURE_TIME_ABSOLUTE_CONTROL		0x04
+#define RTSCAM_SOC_CT_EXPOSURE_TIME_RELATIVE_CONTROL		0x05
+#define RTSCAM_SOC_CT_FOCUS_ABSOLUTE_CONTROL			0x06
+#define RTSCAM_SOC_CT_FOCUS_RELATIVE_CONTROL			0x07
+#define RTSCAM_SOC_CT_FOCUS_AUTO_CONTROL			0x08
+#define RTSCAM_SOC_CT_IRIS_ABSOLUTE_CONTROL			0x09
+#define RTSCAM_SOC_CT_IRIS_RELATIVE_CONTROL			0x0A
+#define RTSCAM_SOC_CT_ZOOM_ABSOLUTE_CONTROL			0x0B
+#define RTSCAM_SOC_CT_ZOOM_RELATIVE_CONTROL			0x0C
+#define RTSCAM_SOC_CT_PANTILT_ABSOLUTE_CONTROL			0x0D
+#define RTSCAM_SOC_CT_PANTILT_RELATIVE_CONTROL			0x0E
+#define RTSCAM_SOC_CT_ROLL_ABSOLUTE_CONTROL			0x0F
+#define RTSCAM_SOC_CT_ROLL_RELATIVE_CONTROL			0x10
+#define RTSCAM_SOC_CT_PRIVACY_CONTROL				0x11
+#define RTSCAM_SOC_CT_FOCUS_SIMPLE_CONTROL			0x12
+#define RTSCAM_SOC_CT_WINDOW_CONTROL				0x13
+#define RTSCAM_SOC_CT_REGION_OF_INTEREST_CONTROL		0x14
+
+/* A.6 Rtk Extended Control Selectors */
+#define RTSCAM_SOC_RTK_EXT_ISP_SPECIAL_EFFECT_CTL		0x01
+#define RTSCAM_SOC_RTK_EXT_EVCOM_CTL				0x02
+#define RTSCAM_SOC_RTK_EXT_CTE_CTL				0x03
+#define RTSCAM_SOC_RTK_EXT_AE_LOCK_CTL				0x04
+#define RTSCAM_SOC_RTK_EXT_AWB_LOCK_CTL				0x05
+#define RTSCAM_SOC_RTK_EXT_AF_LOCK_CTL				0x06
+#define RTSCAM_SOC_RTK_EXT_LED_TORCH_CTL			0x07
+#define RTSCAM_SOC_RTK_EXT_LED_FLASH_CTL			0x08
+#define RTSCAM_SOC_RTK_EXT_ISO_CTL				0x09
+#define RTSCAM_SOC_RTK_EXT_PHOTO_SCENEMODE_CTL			0x0A
+#define RTSCAM_SOC_RTK_EXT_ROI_MODE_CTL				0x13
+/* CT_REGION_OF_INTEREST_CONTROL defined in UVC1.5 */
+#define RTSCAM_SOC_RTK_EXT_ROI_CTL				0x14
+#define RTSCAM_SOC_RTK_EXT_3ASTS_CTL				0x15
+#define RTSCAM_SOC_RTK_EXT_BURSTMODE_CTL			0x16
+#define RTSCAM_SOC_RTK_EXT_STILLMODE_CTL			0x17
+#define RTSCAM_SOC_RTK_EXT_STILLSETTING_CTL			0x18
+#define RTSCAM_SOC_RTK_EXT_IDEAEYE_SENSITIVITY_CTL		0x19
+#define RTSCAM_SOC_RTK_EXT_IDEAEYE_STATUS_CTL			0x1A
+#define RTSCAM_SOC_RTK_EXT_IDEAEYE_MODE_CTL			0x1B
+#define RTSCAM_SOC_RTK_EXT_IQ_MODE_CTL				0x1d
+#define RTSCAM_SOC_RTK_EXT_IQ_PARAMETER_CTL			0x1e
+#define RTSCAM_SOC_RTK_EXT_GAIN_CONTROL				0x1f
+#define RTSCAM_SOC_RTK_EXT_SNR_CROP_CTRL			0x20
+struct rtscam_soc_cmd_stru {
+	__u16 cmdcode;
+	__u8 index;
+	__u8 length;
+	__u16 param;
+	__u16 addr;
+	__u8 *buf;
+	__u32 reserved[1];
+};
+
+struct rtscam_soc_ext_cmds {
+	__u32 count;
+	struct rtscam_soc_cmd_stru *cmds;
+};
+
+struct rtscam_soc_ldc_stru {
+	unsigned int length;
+	__u8 *ptable;
+};
+
+struct rtscam_soc_hw_ver {
+	unsigned int hw_ver;
+	unsigned int hw_id;
+};
+
+struct rtscam_soc_ive_ctrl {
+	int enable;
+	struct {
+		__u8 r;
+		__u8 g;
+		__u8 b;
+	} normal_mean;
+	__u16 normal_scale;
+	int8_t quant_len;
+	__u32 asym_inv_scale;
+	__u8 asym_zero_point;
+};
+
+struct rtscam_soc_verify_info {
+	__u32 src_w;
+	__u32 src_h;
+	__u32 src_w_actual;
+	__u32 src_h_actual;
+	__u32 dst_w;
+	__u32 dst_h;
+	__u32 src_phyaddr;
+	__u8 src_fmt;
+};
+
+enum rts_verify_fmt {
+	RTS_VERIFY_FMT_YUV422_SEMI = 0,
+	RTS_VERIFY_FMT_YUV422_INTER = 4
+};
+
+#define RTSOCIOC_G_STREAMID	_IOCTL_IOR('s', 0x30, int)
+#define RTSOCIOC_G_HWOFFSET	_IOCTL_IOR('s', 0x31, unsigned long)
+#define RTSOCIOC_G_HWIOSIZE	_IOCTL_IOR('s', 0x32, unsigned int)
+
+//#define RTSOCIOC_CAMERA_HW_VER	_IOCTL_IOR('s', 0x40, struct rtscam_soc_hw_ver)
+
+#define RTSOCIOC_PAUSE		_IOCTL_IO('s', 0x60)
+#define RTSOCIOC_RESUME		_IOCTL_IO('s', 0x61)
+
+#define RTSOCIOC_S_IVE_CTRL	_IOCTL_IOW('s', 0x70, struct rtscam_soc_ive_ctrl)
+#define RTSOCIOC_G_IVE_CTRL	_IOCTL_IOR('s', 0x71, struct rtscam_soc_ive_ctrl)
+
+#define RTSOCIOC_S_VINFO	_IOCTL_IOW('s', 0x80, struct rtscam_soc_verify_info)
+
+#define RTSOCIOC_CAMERA_DETACH _IOCTL_IO('s', 0x50)
+#define RTSOCIOC_CAMERA_ATTACH _IOCTL_IO('s', 0x51)
+
+#define RTSZOOMIOC_SET_SUBDEV	_IOCTL_IOW('z', 0x01, int)
+#define RTSZOOMIOC_GET_SUBDEV	_IOCTL_IOR('z', 0x02, int)
+
+#endif

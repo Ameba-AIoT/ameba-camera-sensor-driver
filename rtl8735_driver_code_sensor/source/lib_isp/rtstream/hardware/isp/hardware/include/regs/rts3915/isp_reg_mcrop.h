@@ -1,0 +1,35 @@
+#ifndef _ISP_REG_MCROP_H_INC_
+#define _ISP_REG_MCROP_H_INC_
+
+#include <isp_reg.h>
+#include <isp_reg_base.h>
+
+#define MCROP_START_X (MCROP_REG_BASE + 0x0000)
+#define MCROP_START_Y (MCROP_REG_BASE + 0x0004)
+#define MCROP_FRAME_WIDTH (MCROP_REG_BASE + 0x0008)
+#define MCROP_FRAME_HEIGHT (MCROP_REG_BASE + 0x000C)
+#define MCROP_REG_LOAD (MCROP_REG_BASE + 0x0010)
+
+/* MCROP_START_X 0x0000 */
+#define BLC_START_X_OFFSET 0
+#define BLC_START_X_BITS 12
+#define BLC_START_X_MASK (((1 << 12) - 1) << 0)
+/* MCROP_START_Y 0x0004 */
+#define BLC_START_Y_OFFSET 0
+#define BLC_START_Y_BITS 12
+#define BLC_START_Y_MASK (((1 << 12) - 1) << 0)
+/* MCROP_FRAME_WIDTH 0x0008 */
+#define FRAME_WIDTH_OFFSET 0
+#define FRAME_WIDTH_BITS 12
+#define FRAME_WIDTH_MASK (((1 << 12) - 1) << 0)
+/* MCROP_FRAME_HEIGHT 0x000C */
+#define FRAME_HEIGHT_OFFSET 0
+#define FRAME_HEIGHT_BITS 12
+#define FRAME_HEIGHT_MASK (((1 << 12) - 1) << 0)
+/* MCROP_REG_LOAD 0x0010 */
+#define CROP_REG_LOAD_OFFSET 0
+#define CROP_REG_LOAD_BITS 1
+#define CROP_REG_LOAD_MASK (((1 << 1) - 1) << 0)
+
+#endif /* _ISP_REG_MCROP_H_INC_ */
+

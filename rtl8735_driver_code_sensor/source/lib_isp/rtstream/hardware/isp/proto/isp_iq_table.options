@@ -1,0 +1,154 @@
+* long_names:false proto3_singular_msgs:true mangle_names:M_FLATTEN
+
+isp_iq_bounds_t.bounds type:FT_POINTER
+isp_iq_hysteresis_bounds_t.bounds type:FT_POINTER
+
+isp_iq_blc_offset_t.* max_count:2 fixed_count:true int_size:16
+isp_iq_blc_ct_item_t.offsets type:FT_POINTER
+isp_iq_blc_dyn_ct_t.ct_items type:FT_POINTER
+isp_iq_blc_dyn_ht_t.offsets type:FT_POINTER
+
+isp_iq_nlsc_common_t.*_curve int_size:16 type:FT_POINTER
+isp_iq_nlsc_common_t.step int_size:8
+isp_iq_nlsc_adj_t.* int_size:8
+isp_iq_nlsc_ct_item_t.adjs type:FT_POINTER
+isp_iq_nlsc_dyn_ct_t.ct_items type:FT_POINTER
+isp_iq_nlsc_dyn_ct_t.pixels_* int_size:16
+
+isp_iq_mlsc_t.mode int_size:8
+isp_iq_mlsc_t.matrix* type:FT_POINTER int_size:8
+
+isp_iq_ae1_t.win_weight max_count:256 fixed_count:true int_size:8
+isp_iq_ae1_t.y_mean_* int_size:16
+isp_iq_ae1_t.same_block_* int_size:16
+isp_iq_ae1_t.ae_stable_delay int_size:16
+isp_iq_ae1_t.total_gain_max int_size:16
+isp_iq_ae1_t.dyn_fps_min int_size:32
+isp_iq_ae1_t.dyn_gain_th max_count:5 fixed_count:true int_size:16
+isp_iq_ae1_t.dyn_fps max_count:6 fixed_count:true int_size:32
+isp_iq_ae1_t.saturated_range_* int_size:8
+isp_iq_ae1_t.sort_weight_ratio int_size:8
+isp_iq_ae1_t.manual_level int_size:8
+isp_iq_ae1_t.sort_win_weight_low max_count:256 fixed_count:true int_size:8
+isp_iq_ae1_t.sort_win_weight_high max_count:256 fixed_count:true int_size:8
+isp_iq_ae1_t.hist_pos_* int_size:16
+isp_iq_ae1_t.hist_percentage_* int_size:16
+isp_iq_ae1_dyn_sort_table_t.tables int_size:8 type:FT_POINTER
+isp_iq_ae1_dyn_ratio_range_t.ranges max_count:16
+isp_iq_ae1_ratio_inc_ctrl_t.enable int_size:8
+isp_iq_ae1_hdr_t.over_bin int_size:16
+isp_iq_ae1_hdr_t.*_offset int_size:16
+isp_iq_ae1_hdr_t.hist_mean_* int_size:16
+isp_iq_ae1_t.switch_start_ae_count int_size:8
+isp_iq_ae1_t.ae_intp_delay_frame int_size:8
+
+isp_iq_awb1_weight_table_t.* int_size:8 type:FT_POINTER
+isp_iq_awb1_green_t.*_thd int_size:8
+isp_iq_awb1_green_t.x_* int_size:16
+isp_iq_awb1_green_t.y_* int_size:16
+isp_iq_awb1_green_t.b_delta int_size:16
+isp_iq_awb1_mixct_t.* int_size:8
+isp_iq_awb1_rough_limit_t.*_min int_size:16
+isp_iq_awb1_rough_limit_t.*_max int_size:16
+isp_iq_awb1_fine_limit_t.*_min int_size:16
+isp_iq_awb1_fine_limit_t.*_max int_size:16
+isp_iq_awb1_illums_t.*_gain max_count:6 fixed_count:true int_size:16
+isp_iq_awb1_illums_t.*_min int_size:16
+isp_iq_awb1_illums_t.*_max int_size:16
+isp_iq_awb1_t.ct_num int_size:8
+isp_iq_awb1_t.ct_block_num int_size:8
+isp_iq_awb1_t.ct type:FT_POINTER
+isp_iq_awb1_t.illum_ct int_size:16 type:FT_POINTER
+isp_iq_awb1_t.*_area_* type:FT_POINTER
+isp_iq_awb1_t.fine_gain_th int_size:8
+isp_iq_awb1_t.final_gain_diff_th int_size:16
+isp_iq_awb1_t.white_pixels_ratio int_size:16
+isp_iq_awb1_t.awb_stable_delay int_size:16
+isp_iq_awb_gain_adj_t.*_gain int_size:16
+isp_iq_awb_ct_item_t.adjs type:FT_POINTER
+isp_iq_awb_dyn_ct_t.ct_items type:FT_POINTER
+isp_iq_awb1_t.min_bright_th int_size:8
+isp_iq_awb1_t.switch_start_awb_count int_size:8
+isp_iq_awb1_t.awb_intp_delay_frame int_size:8
+
+isp_iq_af1_t.af_statis_th int_size:8
+isp_iq_af1_t.fine_step int_size:8
+isp_iq_af1_t.fine_decrease_cnt int_size:8
+isp_iq_af1_t.rough_step int_size:8
+isp_iq_af1_t.rough_decrease_cnt int_size:8
+isp_iq_af1_t.diff_cnt int_size:8
+isp_iq_af1_t.ng_pos int_size:8
+isp_iq_af1_t.pos max_count:24 fixed_count:true int_size:16
+isp_iq_af1_t.color_diff_* int_size:16
+isp_iq_af1_block_t.*_bound int_size:16
+
+isp_iq_ccm_item_t.ccm max_count:9 fixed_count:true int_size:16
+isp_iq_ccm_ct_item_t.gain_items type:FT_POINTER
+isp_iq_ccm_dyn_ct_t.ct_items type:FT_POINTER
+isp_iq_ccm_dyn_ht_t.items type:FT_POINTER
+
+isp_iq_gamma_item_t.curve int_size:16 type:FT_POINTER
+isp_iq_gamma_ratio_item_t.gain_items type:FT_POINTER
+isp_iq_gamma_dyn_ratio_t.ratio_items type:FT_POINTER
+isp_iq_gamma_dyn_ht_t.items type:FT_POINTER
+
+isp_iq_wdr1_t.*_percent int_size:8
+isp_iq_wdr1_t.high_bins_avg_rgb_th int_size:8
+isp_iq_wdr1_t.hist_contrast_intp int_size:8
+isp_iq_wdr1_t.hist_contrast_intp_compress int_size:8
+isp_iq_wdr1_t.expand_num int_size:8
+isp_iq_wdr1_t.hist_contrast_expand max_count:32 fixed_count:true
+isp_iq_wdr1_t.power_gain int_size:8
+isp_iq_wdr1_t.map_num int_size:8
+isp_iq_wdr1_t.hist_contrast_thd max_count:7 fixed_count:true int_size:16
+isp_iq_wdr1_t.wdr_target_map max_count:7 fixed_count:true int_size:16
+isp_iq_wdr1_t.wdr_target_limit int_size:16
+isp_iq_wdr1_t.step int_size:8
+
+isp_iq_ygc_item_t.curve int_size:16 type:FT_POINTER
+isp_iq_ygc_ratio_item_t.gain_items type:FT_POINTER
+isp_iq_ygc_dyn_ratio_t.ratio_items type:FT_POINTER
+isp_iq_ygc_dyn_ht_t.items type:FT_POINTER
+
+isp_iq_tm_item_t.long_luma_thd* fixed_count:true max_count:11 int_size:8
+isp_iq_tm_item_t.short_luma_thd* fixed_count:true max_count:11 int_size:8
+isp_iq_tm_item_t.long_luma_offset int_size:8
+isp_iq_tm_item_t.short_luma_offset int_size:8
+isp_iq_tm_item_t.direct_factor_k0 int_size:8
+isp_iq_tm_item_t.direct_factor_k1 int_size:8
+isp_iq_tm_item_t.direct_factor_k2 int_size:8
+isp_iq_tm_item_t.direct_weight_w0 int_size:8
+isp_iq_tm_item_t.direct_weight_w1 int_size:8
+isp_iq_tm_item_t.rate_max int_size:16
+isp_iq_tm_item_t.rate_min int_size:16
+isp_iq_tm_dyn_gain_t.gain_items type:FT_POINTER
+isp_iq_tm_dyn_ht_t.items type:FT_POINTER
+
+isp_iq_snr_item_t.offset int_size:16
+isp_iq_snr_item_t.ratio int_size:16
+isp_iq_snr_dyn_gain_t.gain_items type:FT_POINTER
+
+isp_iq_uvtune_item_t.mats int_size:16 type:FT_POINTER
+isp_iq_uvtune_ct_item_t.gain_items type:FT_POINTER
+isp_iq_uvtune_dyn_ct_t.ct_items type:FT_POINTER
+
+isp_iq_uv_offset_item_t.u int_size:16
+isp_iq_uv_offset_item_t.v int_size:16
+isp_iq_uv_offset_t.items type:FT_POINTER
+
+isp_iq_texture_static_t.* type:FT_POINTER
+isp_iq_texture_dynamic_t.values type:FT_POINTER
+isp_iq_texture_dynamic_offset_t.* type:FT_POINTER
+isp_iq_texture_dynamic_value_t.* type:FT_POINTER
+isp_iq_texture_dyn_ratio_item_t.gain_items type:FT_POINTER
+isp_iq_texture_dyn_ratio_t.ratio_items type:FT_POINTER
+
+isp_iq_daynight_t.exit_ir_gain_th int_size:8
+isp_iq_daynight_t.*_time int_size:16
+isp_iq_daynight_t.*_table int_size:8 type:FT_POINTER
+
+isp_iq_md_t.noise_thd int_size:16 fixed_count:true max_count:4
+isp_iq_md_item_t.ratio int_size:16 fixed_count:true max_count:4
+isp_iq_md_dyn_gain_t.gain_items type:FT_POINTER
+
+isp_iq_table_t.* type:FT_POINTER

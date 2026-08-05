@@ -1,0 +1,70 @@
+#ifndef _ISP_REG_FLICK_H_INC_
+#define _ISP_REG_FLICK_H_INC_
+
+#include <isp_reg.h>
+#include <isp_reg_base.h>
+
+#define FLICK_CTRL (FLICK_REG_BASE + 0x0000)
+#define FLICK_SAMPLE_STEP (FLICK_REG_BASE + 0x0004)
+#define FLICK_SAMPLE_START (FLICK_REG_BASE + 0x0008)
+#define FLICK_FFT_RESULT_CONTRL (FLICK_REG_BASE + 0x000C)
+#define FLICK_FFT_RESUT_SUM2_127 (FLICK_REG_BASE + 0x0010)
+#define FLICK_FFT_RESUT_SUM2_9 (FLICK_REG_BASE + 0x0014)
+
+/* FLICK_CTRL 0x0000 */
+#define FLICK_START_OFFSET 0
+#define FLICK_START_BITS 1
+#define FLICK_START_MASK (((1 << 1) - 1) << 0)
+#define FLICK_STOP_OFFSET 1
+#define FLICK_STOP_BITS 1
+#define FLICK_STOP_MASK (((1 << 1) - 1) << 1)
+#define FLICK_IDLE_OFFSET 2
+#define FLICK_IDLE_BITS 1
+#define FLICK_IDLE_MASK (((1 << 1) - 1) << 2)
+#define FLICK_ERROR_FLAG_OFFSET 3
+#define FLICK_ERROR_FLAG_BITS 1
+#define FLICK_ERROR_FLAG_MASK (((1 << 1) - 1) << 3)
+#define FLICK_MODE_OFFSET 4
+#define FLICK_MODE_BITS 1
+#define FLICK_MODE_MASK (((1 << 1) - 1) << 4)
+/* FLICK_SAMPLE_STEP 0x0004 */
+#define FLICK_H_DEC_OFFSET 0
+#define FLICK_H_DEC_BITS 4
+#define FLICK_H_DEC_MASK (((1 << 4) - 1) << 0)
+#define FLICK_H_INT_OFFSET 4
+#define FLICK_H_INT_BITS 4
+#define FLICK_H_INT_MASK (((1 << 4) - 1) << 4)
+#define FLICK_V_DEC_OFFSET 8
+#define FLICK_V_DEC_BITS 4
+#define FLICK_V_DEC_MASK (((1 << 4) - 1) << 8)
+#define FLICK_V_INT_OFFSET 12
+#define FLICK_V_INT_BITS 4
+#define FLICK_V_INT_MASK (((1 << 4) - 1) << 12)
+/* FLICK_SAMPLE_START 0x0008 */
+#define FLICK_START_H_OFFSET 0
+#define FLICK_START_H_BITS 12
+#define FLICK_START_H_MASK (((1 << 12) - 1) << 0)
+#define FLICK_START_V_OFFSET 16
+#define FLICK_START_V_BITS 12
+#define FLICK_START_V_MASK (((1 << 12) - 1) << 16)
+/* FLICK_FFT_RESULT_CONTRL 0x000C */
+#define FLICK_RESULT_TYPE_OFFSET 0
+#define FLICK_RESULT_TYPE_BITS 1
+#define FLICK_RESULT_TYPE_MASK (((1 << 1) - 1) << 0)
+#define FW_TRIG_FFT_OFFSET 1
+#define FW_TRIG_FFT_BITS 1
+#define FW_TRIG_FFT_MASK (((1 << 1) - 1) << 1)
+#define FLICK_SHIFT_BITS_OFFSET 2
+#define FLICK_SHIFT_BITS_BITS 3
+#define FLICK_SHIFT_BITS_MASK (((1 << 3) - 1) << 2)
+/* FLICK_FFT_RESUT_SUM2_127 0x0010 */
+#define FFT_SUM_OFFSET 0
+#define FFT_SUM_BITS 26
+#define FFT_SUM_MASK (((1 << 26) - 1) << 0)
+/* FLICK_FFT_RESUT_SUM2_9 0x0014 */
+#define FFT_SUM_PART_OFFSET 0
+#define FFT_SUM_PART_BITS 26
+#define FFT_SUM_PART_MASK (((1 << 26) - 1) << 0)
+
+#endif /* _ISP_REG_FLICK_H_INC_ */
+

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+message isp_statis_raw_t {
+  repeated fixed32 r_mean = 1;
+  repeated fixed32 gr_mean = 2;
+  repeated fixed32 gb_mean = 3;
+  repeated fixed32 b_mean = 4;
+  repeated fixed32 y_mean = 5;
+  repeated fixed32 rg = 6;
+  repeated fixed32 bg = 7;
+  repeated fixed32 pixels = 8;
+}
+
+message isp_statis_awb_t {
+  repeated fixed32 r_mean = 1;
+  repeated fixed32 g_mean = 2;
+  repeated fixed32 b_mean = 3;
+  repeated fixed32 y_mean = 4;
+  repeated fixed32 rg = 5;
+  repeated fixed32 bg = 6;
+  repeated fixed32 pixels = 7;
+  repeated fixed32 illum_white_pixels = 8;
+  fixed32 fine_r_sum = 9;
+  fixed32 fine_g_sum = 10;
+  fixed32 fine_b_sum = 11;
+  fixed32 fine_white_pixels = 12;
+}
+
+message isp_statis_ae_hdr_t {
+  repeated fixed32 y_mean = 1;
+  repeated fixed32 hist = 2;
+}
+
+message isp_statis_ae_t {
+  repeated fixed32 y_mean = 1;
+  repeated fixed32 hist = 2;
+  repeated isp_statis_ae_hdr_t hdr = 3;
+}
+
+message isp_statis_af_t {
+  repeated fixed32 edges = 1;
+  fixed32 num0 = 2;
+  fixed32 sum0 = 3;
+  fixed32 num1 = 4;
+  fixed32 sum1 = 5;
+}
+
+message isp_statis_flick_t {
+  fixed32 valid = 1;
+  fixed32 fft_sum_2_9 = 2;
+  fixed32 fft_sum_2_127 = 3;
+}
+
+message isp_statis_y_t {
+  repeated fixed32 y_mean = 1;
+  repeated fixed32 hist = 2;
+}
+
+message isp_statis_t {
+  fixed32 frame_count = 1;
+  isp_statis_raw_t raw = 2;
+  isp_statis_awb_t awb = 3;
+  isp_statis_ae_t ae = 4;
+  isp_statis_af_t af = 5;
+  isp_statis_flick_t flick = 6;
+  isp_statis_y_t y = 7;
+}
+

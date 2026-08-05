@@ -1,0 +1,29 @@
+* long_names:false proto3_singular_msgs:true mangle_names:M_FLATTEN
+
+*_writable no_unions:true
+
+*.ct_index int_size:8
+*.gain_index int_size:8
+*.ratio_index int_size:8
+*.ht_index int_size:8
+
+isp_algo_param_ae_t.y_mean int_size:16
+isp_algo_param_ae_t.sort_gain_index int_size:8
+isp_algo_param_ae_t.gain max_count:2 fixed_count:true
+isp_algo_param_ae_t.exposure max_count:2 fixed_count:true
+isp_algo_param_ae_t.over_ratio max_count:2 fixed_count:true
+isp_algo_param_ae_t.hist_mean max_count:2 fixed_count:true
+isp_algo_param_ae_t.is_stable max_count:2 fixed_count:true int_size:8
+isp_algo_param_ae_t.cur_drc_region int_size:8
+
+isp_algo_param_awb_t.adj_ct_index int_size:8
+isp_algo_param_awb_t.adj_gain_index int_size:8
+
+isp_algo_point_t.* int_size:16
+
+isp_algo_param_flick_t.insert_dummy_line int_size:16
+
+isp_algo_param_wdr_t.low_bound int_size:8
+isp_algo_param_wdr_t.wdr_level int_size:8
+
+isp_algo_param_md_t.md_val int_size:16

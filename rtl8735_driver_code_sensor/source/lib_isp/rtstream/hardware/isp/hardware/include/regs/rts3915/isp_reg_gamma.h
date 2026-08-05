@@ -1,0 +1,156 @@
+#ifndef _ISP_REG_GAMMA_H_INC_
+#define _ISP_REG_GAMMA_H_INC_
+
+#include <isp_reg.h>
+#include <isp_reg_base.h>
+
+#define GAMMA_SYNC (GAMMA_REG_BASE + 0x0000)
+#define GAMMA_PARAMETER0 (GAMMA_REG_BASE + 0x0004)
+#define GAMMA_PARAMETER1 (GAMMA_REG_BASE + 0x0008)
+#define GAMMA_PARAMETER2 (GAMMA_REG_BASE + 0x000C)
+#define GAMMA_PARAMETER3 (GAMMA_REG_BASE + 0x0010)
+#define GAMMA_PARAMETER4 (GAMMA_REG_BASE + 0x0014)
+#define GAMMA_PARAMETER5 (GAMMA_REG_BASE + 0x0018)
+#define GAMMA_PARAMETER6 (GAMMA_REG_BASE + 0x001C)
+#define GAMMA_PARAMETER7 (GAMMA_REG_BASE + 0x0020)
+#define GAMMA_PARAMETER8 (GAMMA_REG_BASE + 0x0024)
+#define GAMMA_PARAMETER9 (GAMMA_REG_BASE + 0x0028)
+#define GAMMA_PARAMETER10 (GAMMA_REG_BASE + 0x002C)
+#define GAMMA_PARAMETER11 (GAMMA_REG_BASE + 0x0030)
+#define GAMMA_PARAMETER12 (GAMMA_REG_BASE + 0x0034)
+#define GAMMA_PARAMETER13 (GAMMA_REG_BASE + 0x0038)
+#define GAMMA_PARAMETER14 (GAMMA_REG_BASE + 0x003C)
+#define GAMMA_PARAMETER15 (GAMMA_REG_BASE + 0x0040)
+#define GAMMA_PARAMETER16 (GAMMA_REG_BASE + 0x0044)
+#define GAMMA_PARAMETER17 (GAMMA_REG_BASE + 0x0048)
+
+/* GAMMA_SYNC 0x0000 */
+#define GAMMA_PLOAD_DLY_OFFSET 0
+#define GAMMA_PLOAD_DLY_BITS 1
+#define GAMMA_PLOAD_DLY_MASK (((1 << 1) - 1) << 0)
+/* GAMMA_PARAMETER0 0x0004 */
+#define GAMMA_P0_OFFSET 0
+#define GAMMA_P0_BITS 12
+#define GAMMA_P0_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P1_OFFSET 16
+#define GAMMA_P1_BITS 12
+#define GAMMA_P1_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER1 0x0008 */
+#define GAMMA_P2_OFFSET 0
+#define GAMMA_P2_BITS 12
+#define GAMMA_P2_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P3_OFFSET 16
+#define GAMMA_P3_BITS 12
+#define GAMMA_P3_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER2 0x000C */
+#define GAMMA_P4_OFFSET 0
+#define GAMMA_P4_BITS 12
+#define GAMMA_P4_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P5_OFFSET 16
+#define GAMMA_P5_BITS 12
+#define GAMMA_P5_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER3 0x0010 */
+#define GAMMA_P6_OFFSET 0
+#define GAMMA_P6_BITS 12
+#define GAMMA_P6_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P7_OFFSET 16
+#define GAMMA_P7_BITS 12
+#define GAMMA_P7_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER4 0x0014 */
+#define GAMMA_P8_OFFSET 0
+#define GAMMA_P8_BITS 12
+#define GAMMA_P8_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P9_OFFSET 16
+#define GAMMA_P9_BITS 12
+#define GAMMA_P9_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER5 0x0018 */
+#define GAMMA_P10_OFFSET 0
+#define GAMMA_P10_BITS 12
+#define GAMMA_P10_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P11_OFFSET 16
+#define GAMMA_P11_BITS 12
+#define GAMMA_P11_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER6 0x001C */
+#define GAMMA_P12_OFFSET 0
+#define GAMMA_P12_BITS 12
+#define GAMMA_P12_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P13_OFFSET 16
+#define GAMMA_P13_BITS 12
+#define GAMMA_P13_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER7 0x0020 */
+#define GAMMA_P14_OFFSET 0
+#define GAMMA_P14_BITS 12
+#define GAMMA_P14_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P15_OFFSET 16
+#define GAMMA_P15_BITS 12
+#define GAMMA_P15_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER8 0x0024 */
+#define GAMMA_P16_OFFSET 0
+#define GAMMA_P16_BITS 12
+#define GAMMA_P16_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P17_OFFSET 16
+#define GAMMA_P17_BITS 12
+#define GAMMA_P17_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER9 0x0028 */
+#define GAMMA_P18_OFFSET 0
+#define GAMMA_P18_BITS 12
+#define GAMMA_P18_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P19_OFFSET 16
+#define GAMMA_P19_BITS 12
+#define GAMMA_P19_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER10 0x002C */
+#define GAMMA_P20_OFFSET 0
+#define GAMMA_P20_BITS 12
+#define GAMMA_P20_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P21_OFFSET 16
+#define GAMMA_P21_BITS 12
+#define GAMMA_P21_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER11 0x0030 */
+#define GAMMA_P22_OFFSET 0
+#define GAMMA_P22_BITS 12
+#define GAMMA_P22_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P23_OFFSET 16
+#define GAMMA_P23_BITS 12
+#define GAMMA_P23_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER12 0x0034 */
+#define GAMMA_P24_OFFSET 0
+#define GAMMA_P24_BITS 12
+#define GAMMA_P24_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P25_OFFSET 16
+#define GAMMA_P25_BITS 12
+#define GAMMA_P25_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER13 0x0038 */
+#define GAMMA_P26_OFFSET 0
+#define GAMMA_P26_BITS 12
+#define GAMMA_P26_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P27_OFFSET 16
+#define GAMMA_P27_BITS 12
+#define GAMMA_P27_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER14 0x003C */
+#define GAMMA_P28_OFFSET 0
+#define GAMMA_P28_BITS 12
+#define GAMMA_P28_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P29_OFFSET 16
+#define GAMMA_P29_BITS 12
+#define GAMMA_P29_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER15 0x0040 */
+#define GAMMA_P30_OFFSET 0
+#define GAMMA_P30_BITS 12
+#define GAMMA_P30_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P31_OFFSET 16
+#define GAMMA_P31_BITS 12
+#define GAMMA_P31_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER16 0x0044 */
+#define GAMMA_P32_OFFSET 0
+#define GAMMA_P32_BITS 12
+#define GAMMA_P32_MASK (((1 << 12) - 1) << 0)
+#define GAMMA_P33_OFFSET 16
+#define GAMMA_P33_BITS 12
+#define GAMMA_P33_MASK (((1 << 12) - 1) << 16)
+/* GAMMA_PARAMETER17 0x0048 */
+#define GAMMA_P34_OFFSET 0
+#define GAMMA_P34_BITS 12
+#define GAMMA_P34_MASK (((1 << 12) - 1) << 0)
+
+#endif /* _ISP_REG_GAMMA_H_INC_ */
+

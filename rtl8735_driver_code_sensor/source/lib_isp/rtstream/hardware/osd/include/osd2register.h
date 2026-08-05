@@ -1,0 +1,63 @@
+/*
+ * Realtek Semiconductor Corp.
+ *
+ * rtsosd2/include/osd2register.h
+ *
+ * Copyright (C) 2016      Ming Qian<ming_qian@realsil.com.cn>
+ */
+#ifndef _RTSOSD2_REGISTER_H
+#define _RTSOSD2_REGISTER_H
+
+#include <stdint.h>
+
+enum osd2_reg_name {
+	OSD2_REG_PAINTER_STOP,
+	OSD2_REG_PAINTER_START,
+	OSD2_REG_CMD_ADDR,
+	OSD2_REG_UV_POS,
+	OSD2_REG_UV_MODE,
+	OSD2_REG_Y_R,
+	OSD2_REG_Y_G,
+	OSD2_REG_Y_B,
+	OSD2_REG_U_R,
+	OSD2_REG_U_G,
+	OSD2_REG_U_B,
+	OSD2_REG_V_R,
+	OSD2_REG_V_G,
+	OSD2_REG_V_B,
+	OSD2_REG_YUV_SLICE_WIDTH,
+	OSD2_REG_ARGB8888_SLICE_WIDTH,
+	OSD2_REG_PAINTER_CS,
+	OSD2_REG_PAINTER_IDLE,
+	OSD2_REG_BUF_OVERFL,
+	OSD2_REG_COLOR_UP_DONE,
+	OSD2_REG_BLOCK_DONE,
+	OSD2_REG_BUSRD_MISMATCH,
+	OSD2_REG_CMD_ERROR,
+	OSD2_REG_VALID_ERROR,
+	OSD2_REG_CMD_DONE,
+	OSD2_REG_PAINTER_DONE,
+	OSD2_REG_BUSRD_CNT,
+	OSD2_REG_BUSRD_LENG,
+	OSD2_REG_COLORMAP_CS,
+	OSD2_REG_LAYER_CS,
+	OSD2_REG_BUSWR_CS,
+	OSD2_REG_BUSRD_CS,
+	OSD2_REG_BLOCK_CS,
+	OSD2_REG_UVBUFF_CS,
+	OSD2_REG_YEBUFF_CS,
+	OSD2_REG_YOBUFF_CS,
+	OSD2_REG_PAINTER_CPU_MODE,
+	OSD2_REG_PAINTER_COLOR_START,
+	OSD2_REG_PAINTER_BLOCK_START,
+	OSD2_REG_NOWAIT_BUFWR_EMPTY,
+	OSD2_REG_BUF_ADDR_OSD,
+	OSD2_REG_RESERVED
+};
+
+void rts_osd2_set_register(const void *ewl, enum osd2_reg_name name,
+		uint32_t value);
+uint32_t rts_osd2_get_register(const void *ewl, enum osd2_reg_name name);
+
+int osd2_dump_register(const void *ewl);
+#endif

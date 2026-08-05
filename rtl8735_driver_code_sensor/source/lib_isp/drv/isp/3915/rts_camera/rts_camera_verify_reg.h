@@ -1,0 +1,33 @@
+/*
+ * Realtek Semiconductor Corp.
+ *
+ * rts_camera_verify_reg.h
+ *
+ * Copyright (C) 2019      Wil_shi<wil_shi@realsil.com.cn>
+ */
+
+#ifndef _RTS_CAMERA_VERIFY_REG_H
+#define _RTS_CAMERA_VERIFY_REG_H
+
+#define RTS_VERIFY_SEL			0x0000
+#define RTS_VERIFY_CTRL			0x0004
+#define RTS_VERIFY_Y_DDR_ADDR0		0x0008
+#define RTS_VERIFY_Y_DDR_ADDR1		0x000C
+#define RTS_VERIFY_UV_DDR_ADDR0		0x0010
+#define RTS_VERIFY_UV_DDR_ADDR1		0x0014
+#define RTS_VERIFY_DDR_ADDR_SEL		0x0018
+#define RTS_VERIFY_Y_DDR_LEN		0x001C
+#define RTS_VERIFY_UV_DDR_LEN		0x0020
+#define RTS_VERIFY_FRAME_NUM		0x0024
+#define RTS_VERIFY_FRAME_FORMAT		0x0028
+#define RTS_VERIFY_FRAME_SIZE		0x002C
+#define RTS_VERIFY_FRAME_CONFG0		0x0030
+#define RTS_VERIFY_FRAME_CONFG1		0x0034
+#define RTS_VERIFY_INT_EN		0x0038
+#define RTS_VERIFY_INT_FLAG		0x003C
+#define RTS_VERIFY_START_FLAG		0x0040
+#define RTS_VERIFY_STOP_FLAG		0x0044
+#define RTS_VERIFY_SCALE_COEF		0x0048
+#define RTS_VERIFY_SCALE_EN		0x004C
+
+#endif

@@ -1,0 +1,77 @@
+{
+  "IsLib": "N",
+  "OutLib": "freertos_mem.a",
+
+  "TargetDep": [
+    "rtl8735b"
+  ],
+
+  "SecureDep": [
+    "Secure",
+    "NonSecure",
+    "Ignore"
+  ],
+  
+  "ChipVersionDep": [
+    "Cut-A",
+    "Cut-B",
+    "Cut-C",
+    "Cut-D"
+  ],
+
+  "BuildModeDep": [
+    "All",
+    "Ram"
+  ],
+
+  "extraIncludes": [
+  ],
+
+  "extraCCFlags": [
+  ],
+  
+  "excludePath": [
+  ],
+
+  "excludeSource": [
+    "heap_1.c",
+    "heap_2.c",
+    "heap_3.c",
+    "heap_5.c"
+  ],
+
+  "PlatformCfg": {
+    "CONFIG_EXRAM_EN": {
+      "0" : {
+	    "Value": 0,
+		
+		"excludePath": [
+		],
+		
+		"excludeSource": [
+		  "heap_4_2.c"
+	    ]      
+      },
+      
+      "1" : {
+	    "Value": 1,
+		  "excludeSource": [
+		  "heap_4.c"
+	    ]      
+      }
+    }
+  },
+
+  "rtl8735b": {
+    "CCFlags": [
+      "-D__FPU_PRESENT"
+    ]
+  },
+
+  "ARMCC-v5": {
+    "CCFlags": [
+      "--gnu"
+	]
+  }
+  
+}
