@@ -1,0 +1,271 @@
+/*
+ * gen_fcs_data.c
+ *
+ *  Created on: 2021¦~11¤ë04¤é
+ *      Author: martinhuang
+ */
+
+
+#include <stdio.h>
+#include "fcs_gen.h"
+
+
+#define ADC_TH_SET_NUM		2
+#define ADC_TH_ITEM			8
+#define SENSOR_CMD_CNT 		200
+
+#define SNR_PWRCTRL_GPIO	0
+#define SNR_RST_GPIO		1
+#define SNR_PWDN_GPIO		2
+#define GPIO_LOW			0
+#define GPIO_HIGH			1
+
+typedef struct isp_fcs_data_for_gc3003_s {
+
+	isp_fcs_header_t header;
+	isp_i2c_info_t i2c_info;
+	uint16_t adc_lut[ADC_TH_SET_NUM][ADC_TH_ITEM];
+	uint32_t sensor_init_data[SENSOR_CMD_CNT];
+
+} isp_fcs_data_for_gc3003_t;
+
+#define COMBINE_CMD(cmd_id, cmd_attb, payload0, payload1)  ( (((payload1)&0xFF)<<24) | (((payload0)&0xFF)<<16) | (((cmd_attb)&0xFF)<<8) | ((cmd_id)&0xFF) )
+#define COMBINE_CMD16(payload0, payload1)  ( (((payload1)&0xFFFF)<<16)  | ((payload0)&0xFFFF) )
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
+isp_fcs_data_for_gc3003_t fcs_data_gc3003_v0 = {
+	.header = {
+		.magic = ISP_FCS_DATA_MAGIC_NUM,
+		.version = ISP_FCS_DATA_VERSION | 0x0300,
+		.itcm_size = 0,
+		.dtcm_size = sizeof(isp_fcs_data_for_gc3003_t),
+		.dtcm_addr = FCS_SRAM_ADDR,
+		.i2c_id = 3,
+		.i2c_device_cnt = 1,
+		.i2c_speed_mode = I2CFastSpeed,
+		.i2c_speed = 2000,
+		.i2c_timeout = 10000,
+		.timer_id = 3,
+		.adc_id = 0xFF,   // use 1 gpio
+		.pwm_id = 0xFF,   // same function as ir_led
+		.gpio_cnt = 4,
+		.gpio_list = {
+			[0] = PIN_A5,   // pwr_ctrl
+			[1] = PIN_E4,  //reset  mapping to E0
+			[2] = PIN_D11, //pwdn
+			[3] = PIN_E0,
+		}, //pwdn
+		.i2c_scl = PIN_D12,
+		.i2c_sda = PIN_D10,
+		.snr_clk_pin = PIN_D13,
+		.adc_th_num = ADC_TH_ITEM,
+		.adc_th_table_num = ADC_TH_SET_NUM,
+		.adc_value_byte = 2,
+		.wait_i2c_delay_us = 4000,
+		.snr_timeout_us = 5000,
+		.adc_trig_delay = 1000
+	},
+	.i2c_info = {
+		.addr_len = 2,
+		.data_len = 1,
+		.i2c_slave_addr = 0x37
+	},
+	.sensor_init_data  = {
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_PWRCTRL_GPIO, GPIO_LOW),
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_RST_GPIO, GPIO_LOW),
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_PWDN_GPIO, GPIO_LOW),
+		COMBINE_CMD(ISP_FCS_TIMER_DELAYMS, VALID_ATTB, 1, 0),
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_PWRCTRL_GPIO, GPIO_HIGH),
+		COMBINE_CMD(ISP_FCS_TIMER_DELAYMS, VALID_ATTB, 10, 0),
+		COMBINE_CMD(ISP_FCS_SNR_HCLK_SET, VALID_ATTB, CLK_24M, 0),
+		COMBINE_CMD(ISP_FCS_TIMER_DELAYMS, VALID_ATTB, 3, 0),
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_PWDN_GPIO, GPIO_HIGH),
+		COMBINE_CMD(ISP_FCS_TIMER_DELAYMS, VALID_ATTB, 3, 0),
+		COMBINE_CMD(ISP_FCS_GPIO_SET, VALID_ATTB, SNR_RST_GPIO, GPIO_HIGH),
+		COMBINE_CMD(ISP_FCS_TIMER_DELAYMS, VALID_ATTB, 3, 0),
+		COMBINE_CMD(ISP_FCS_I2C_BSTWRITE_16, VALID_ATTB | ETA_PL_ATTB | END_ATTB, 0, 156),
+		//release_v1.0_2lane_10bit_2304x1296_30fps_24mhz_GC3003.txt
+		//mclk 24Mhz
+		//mipi_data rate=632Mbps/lane
+		//vts = 1340
+		//window_size=2304x1296
+		//row time=24.889us
+		COMBINE_CMD16(0x03fe, 0xf0),
+		COMBINE_CMD16(0x03fe, 0xf0),
+		COMBINE_CMD16(0x03fe, 0xf0),
+		COMBINE_CMD16(0x03fe, 0x00),
+		COMBINE_CMD16(0x03f3, 0x00),
+		COMBINE_CMD16(0x03f5, 0xc0),
+		COMBINE_CMD16(0x03f6, 0x06),
+		COMBINE_CMD16(0x03f7, 0x01),
+		COMBINE_CMD16(0x03f8, 0x4f),
+		COMBINE_CMD16(0x03f9, 0x13),
+		COMBINE_CMD16(0x03fa, 0x00),
+		COMBINE_CMD16(0x03e0, 0x16),
+		COMBINE_CMD16(0x03e1, 0x0d),
+		COMBINE_CMD16(0x03e2, 0x36),
+		COMBINE_CMD16(0x03e4, 0x08),
+		COMBINE_CMD16(0x03fc, 0xce),
+		COMBINE_CMD16(0x0d05, 0x05),
+		COMBINE_CMD16(0x0d06, 0x40),
+		COMBINE_CMD16(0x0d76, 0x00),
+		COMBINE_CMD16(0x0d41, 0x05),
+		COMBINE_CMD16(0x0d42, 0x3c),
+		COMBINE_CMD16(0x0d0a, 0x02),
+		COMBINE_CMD16(0x000c, 0x02),
+		COMBINE_CMD16(0x0d0d, 0x05),
+		COMBINE_CMD16(0x0d0e, 0x18),
+		COMBINE_CMD16(0x000f, 0x09),
+		COMBINE_CMD16(0x0010, 0x08),
+		COMBINE_CMD16(0x0017, 0x0c),
+		COMBINE_CMD16(0x0d53, 0x12),
+		COMBINE_CMD16(0x0051, 0x03),
+		COMBINE_CMD16(0x0082, 0x01),
+		COMBINE_CMD16(0x0086, 0x20),
+		COMBINE_CMD16(0x008a, 0x01),
+		COMBINE_CMD16(0x008b, 0x1d),
+		COMBINE_CMD16(0x008c, 0x05),
+		COMBINE_CMD16(0x008d, 0xd0),
+		COMBINE_CMD16(0x0db7, 0x01),
+		COMBINE_CMD16(0x0db0, 0x05),
+		COMBINE_CMD16(0x0db1, 0x00),
+		COMBINE_CMD16(0x0db2, 0x04),
+		COMBINE_CMD16(0x0db3, 0x54),
+		COMBINE_CMD16(0x0db4, 0x00),
+		COMBINE_CMD16(0x0db5, 0x17),
+		COMBINE_CMD16(0x0db6, 0x08),
+		COMBINE_CMD16(0x0d25, 0xcb),
+		COMBINE_CMD16(0x0d4a, 0x04),
+		COMBINE_CMD16(0x00d2, 0x70),
+		COMBINE_CMD16(0x00d7, 0x19),
+		COMBINE_CMD16(0x00d9, 0x10),
+		COMBINE_CMD16(0x00da, 0xc1),
+		COMBINE_CMD16(0x0d55, 0x1b),
+		COMBINE_CMD16(0x0d92, 0x17),
+		COMBINE_CMD16(0x0dc2, 0x30),
+		COMBINE_CMD16(0x0d2a, 0x30),
+		COMBINE_CMD16(0x0d19, 0x51),
+		COMBINE_CMD16(0x0d29, 0x30),
+		COMBINE_CMD16(0x0d20, 0x30),
+		COMBINE_CMD16(0x0d72, 0x12),
+		COMBINE_CMD16(0x0d4e, 0x12),
+		COMBINE_CMD16(0x0d43, 0x20),
+		COMBINE_CMD16(0x0050, 0x0c),
+		COMBINE_CMD16(0x006e, 0x03),
+		COMBINE_CMD16(0x0153, 0x50),
+		COMBINE_CMD16(0x0192, 0x02), //04
+		COMBINE_CMD16(0x0194, 0x02), //04
+		COMBINE_CMD16(0x0195, 0x05),	//510 = 1296
+		COMBINE_CMD16(0x0196, 0x14),	//10
+		COMBINE_CMD16(0x0197, 0x09),	//900 = 2304
+		COMBINE_CMD16(0x0198, 0x04), 	//00
+		COMBINE_CMD16(0x0077, 0x01),
+		COMBINE_CMD16(0x0078, 0x65),
+		COMBINE_CMD16(0x0079, 0x04),
+		COMBINE_CMD16(0x0067, 0xc0),
+		COMBINE_CMD16(0x0054, 0xff),
+		COMBINE_CMD16(0x0055, 0x02),
+		COMBINE_CMD16(0x0056, 0x00),
+		COMBINE_CMD16(0x0057, 0x04),
+		COMBINE_CMD16(0x005a, 0xff),
+		COMBINE_CMD16(0x005b, 0x07),
+		COMBINE_CMD16(0x00d5, 0x03),
+		COMBINE_CMD16(0x0102, 0x10),
+		COMBINE_CMD16(0x0d4a, 0x04),
+		COMBINE_CMD16(0x04e0, 0xff),
+		COMBINE_CMD16(0x031e, 0x3e),
+		COMBINE_CMD16(0x0159, 0x01),
+		COMBINE_CMD16(0x014f, 0x28),
+		COMBINE_CMD16(0x0150, 0x40),
+		COMBINE_CMD16(0x0026, 0x00),
+		COMBINE_CMD16(0x0d26, 0xa0),
+		COMBINE_CMD16(0x0414, 0x74),
+		COMBINE_CMD16(0x0415, 0x74),
+		COMBINE_CMD16(0x0416, 0x74),
+		COMBINE_CMD16(0x0417, 0x74),
+		COMBINE_CMD16(0x0155, 0x00),
+		COMBINE_CMD16(0x0170, 0x3e),
+		COMBINE_CMD16(0x0171, 0x3e),
+		COMBINE_CMD16(0x0172, 0x3e),
+		COMBINE_CMD16(0x0173, 0x3e),
+		COMBINE_CMD16(0x0428, 0x0b),
+		COMBINE_CMD16(0x0429, 0x0b),
+		COMBINE_CMD16(0x042a, 0x0b),
+		COMBINE_CMD16(0x042b, 0x0b),
+		COMBINE_CMD16(0x042c, 0x0b),
+		COMBINE_CMD16(0x042d, 0x0b),
+		COMBINE_CMD16(0x042e, 0x0b),
+		COMBINE_CMD16(0x042f, 0x0b), //b_use
+		COMBINE_CMD16(0x0430, 0x05),
+		COMBINE_CMD16(0x0431, 0x05),
+		COMBINE_CMD16(0x0432, 0x05),
+		COMBINE_CMD16(0x0433, 0x05),
+		COMBINE_CMD16(0x0434, 0x04),
+		COMBINE_CMD16(0x0435, 0x04),
+		COMBINE_CMD16(0x0436, 0x04),
+		COMBINE_CMD16(0x0437, 0x04), //a_use
+		COMBINE_CMD16(0x0438, 0x18),
+		COMBINE_CMD16(0x0439, 0x18),
+		COMBINE_CMD16(0x043a, 0x18),
+		COMBINE_CMD16(0x043b, 0x18),
+		COMBINE_CMD16(0x043c, 0x1d),
+		COMBINE_CMD16(0x043d, 0x20),
+		COMBINE_CMD16(0x043e, 0x22),
+		COMBINE_CMD16(0x043f, 0x24), //d_use
+		COMBINE_CMD16(0x0468, 0x04),
+		COMBINE_CMD16(0x0469, 0x04),
+		COMBINE_CMD16(0x046a, 0x04),
+		COMBINE_CMD16(0x046b, 0x04),
+		COMBINE_CMD16(0x046c, 0x04),
+		COMBINE_CMD16(0x046d, 0x04),
+		COMBINE_CMD16(0x046e, 0x04),
+		COMBINE_CMD16(0x046f, 0x04), //c_use
+		COMBINE_CMD16(0x0108, 0xf0),
+		COMBINE_CMD16(0x0109, 0x80),
+		COMBINE_CMD16(0x0d03, 0x05),
+		COMBINE_CMD16(0x0d04, 0x00),
+		COMBINE_CMD16(0x007a, 0x60),
+		COMBINE_CMD16(0x00d0, 0x00),
+		COMBINE_CMD16(0x0080, 0x09),
+		COMBINE_CMD16(0x0291, 0x0f),
+		COMBINE_CMD16(0x0292, 0xff),
+		COMBINE_CMD16(0x0201, 0x27),
+		COMBINE_CMD16(0x0202, 0x53),
+		COMBINE_CMD16(0x0203, 0x4e),
+		COMBINE_CMD16(0x0206, 0x03),
+		COMBINE_CMD16(0x0212, 0x0b),
+		COMBINE_CMD16(0x0213, 0x40),
+		COMBINE_CMD16(0x0215, 0x12),
+		COMBINE_CMD16(0x023e, 0x99),
+		COMBINE_CMD16(0x03fe, 0x10),
+		COMBINE_CMD16(0x0183, 0x09),
+		COMBINE_CMD16(0x0187, 0x51),
+		COMBINE_CMD16(0x0d22, 0x04),
+		COMBINE_CMD16(0x0d21, 0x3C),
+		COMBINE_CMD16(0x0d03, 0x01),
+		COMBINE_CMD16(0x0d04, 0x28),
+		COMBINE_CMD16(0x0d23, 0x0e),
+		COMBINE_CMD16(0x03fe, 0x00)
+	}
+};
+
+int main()
+{
+	FILE *ofile;
+	/* Open files */
+	ofile = fopen("fcs_data_gc3003_v0.bin", "wb");
+	if (ofile == NULL) {
+		printf("Error opening files\n");
+		return 1;
+	}
+	fwrite(&fcs_data_gc3003_v0, sizeof(isp_fcs_data_for_gc3003_t), 1, ofile);
+	fclose(ofile);
+	return 0;
+}
+
+
+
+
+
+
+

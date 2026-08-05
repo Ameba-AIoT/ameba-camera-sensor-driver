@@ -1,0 +1,6 @@
+
+
+
+SHA-1: 7a4e0eaa7263f6921ac71832c244ee28d1c8c303
+* [Fcs] update base driver code
+
