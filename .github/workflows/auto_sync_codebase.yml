@@ -1,0 +1,33 @@
+name: Daily Sync Codebase
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0 1,15 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch and run sync script
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          curl -fsSL \
+            -H "Authorization: token ${GH_PAT}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            "https://api.github.com/repos/M-ichae-l/python_script_private/contents/ameba_rtos_pro2_fcs_sensor_auto_sync.sh" \
+            -o sync.sh
+          chmod +x sync.sh
+          bash sync.sh
