@@ -1,13 +1,14 @@
 # AmebaPro2 Camera Sensor Driver
 
-Realtek AmebaPro2 (RTL8735B) camera sensor driver for VOE (Video Out Engine). Supports **Normal Driver** and **Fast Camera Start (FCS)** flows for sensor bring-up.
+Realtek AmebaPro2 (RTL8735B) camera sensor driver for VOE (Video Offload Engine). Supports **Normal Driver** and **Fast Camera Start (FCS)** flows for sensor bring-up.
 
 ## Compilation
-**Please ensure that the toolchain path in Makefile is CORRECT**
+**Please ensure that the toolchain path (``ASDK_DIR``) in ``rtl8735b_driver_code_sensor/source/Makefile`` and ``rtl8735b_driver_code_sensor/source/sensor/Makefile`` are CORRECT**
 
 Build a specific sensor driver:
 
 ```bash
+cd rtl8735b_driver_code_sensor/source/sensor
 make sensor=sc2333 image
 ```
 

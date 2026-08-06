@@ -24,6 +24,13 @@ OBJDUMP	= $(ASDK_DIR)/bin/arm-none-eabi-objdump
 OBJCOPY	= $(ASDK_DIR)/bin/arm-none-eabi-objcopy
 CC_SIZE	= $(ASDK_DIR)/bin/arm-none-eabi-size
 
+# Check if python3 exists. If it does, use it. Otherwise, fall back to python.
+ifeq (, $(shell which python3 2>/dev/null))
+    PYTHON = python
+else
+    PYTHON = python3
+endif
+
 export CC AR AS LD NM STRIP OBJDUMP OBJCOPY CC_SIZE
 
 fpu = soft
@@ -482,7 +489,7 @@ image: obj
 	$(LD) $(LD_FLAGS) $(OBJS) $(LD_LIB) -T rtl8735b_voe.ld -L. -o sensor.axf
 	$(OBJCOPY) -j .sensor -Obinary sensor.axf sensor_ddr.bin
 	$(OBJDUMP) -d sensor.axf > build/sensor_$(sensor).asm
-	python ./gen_sensor_bin.py
+	$(PYTHON) ./gen_sensor_bin.py
 	mv sensor.bin build/sensor_$(sensor).bin
 	mv text.map build/sensor_$(sensor).map
 	cp build/sensor_$(sensor).bin ../output/sensor.bin
