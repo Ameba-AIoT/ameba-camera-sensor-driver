@@ -492,6 +492,7 @@ image: obj
 	$(PYTHON) ./gen_sensor_bin.py
 	mv sensor.bin build/sensor_$(sensor).bin
 	mv text.map build/sensor_$(sensor).map
+	mkdir -p ../output
 	cp build/sensor_$(sensor).bin ../output/sensor.bin
 	cp build/sensor_$(sensor).bin ../output/sensor_$(sensor).bin
 	mv build/sensor_$(sensor).map ../output/sensor_$(sensor).map
