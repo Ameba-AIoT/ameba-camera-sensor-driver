@@ -1,0 +1,891 @@
+/*
+ * Realtek Semiconductor Corp.
+ * Copyright (C) 2017 Grant Shen <grant_shen@realsil.com.cn>
+ * Copyright (C) 2019 Sherry Cheng <sherry_cheng@realsil.com.cn>
+ */
+
+#include <stdio.h>
+#include <platform_conf.h>
+#include "rts_isp_sensor_lib.h"
+#include <sensor_entry.h>
+
+//#if _GC8613_SENSOR_
+
+// #define DEBUG
+#ifdef DEBUG
+#define debug(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#else
+#define debug(fmt, ...)
+#endif
+
+
+#define SUPPORTED_ISP_NUM 1
+#define RTS_ISP_HDR_CHAN_MAX 2
+#define ANALOG_GAIN_MAX_RATIO (float)58.8125
+
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+#define abs(x) ((x) >= 0 ? (x) : -(x))
+
+
+enum {
+	BINNING_MODE=0,
+	FULL_MODE
+};
+
+static int sensor_mode = BINNING_MODE;	//0=BINNING, 1=FULL
+
+struct fps_info {
+	float fps;
+	uint32_t hts;
+	uint32_t vts;
+	uint32_t clk;
+};
+
+struct gc8613_status {
+	enum rts_isp_sensor_hdr_mode hdr;
+	float exp_step;
+	float last_exposure;
+	uint16_t last_vts;
+	uint16_t min_vts;
+	uint8_t gain_reg_num;
+	uint8_t last_gain_reg_num;
+};
+
+struct gc8613_gain_config {
+	uint8_t reg_0614;
+	uint8_t reg_0615;
+	uint8_t reg_0225;
+	uint8_t reg_1467;
+	uint8_t reg_1468;
+	uint8_t reg_00b8;
+	uint8_t reg_00b9;
+	uint8_t reg_1447;
+	uint16_t gain_value;
+};
+
+static struct gc8613_status g_status[SUPPORTED_ISP_NUM] = {[0].hdr = LINEAR_MODE};
+
+static const struct fps_info g_gc8613_fps_info_fhd[] = {
+	{30.0f, 2781, 1208, 100800000},
+};
+static const struct fps_info g_gc8613_fps_info_4k[] = {
+	{15.0f, 4266, 2250, 144000000},
+};
+
+static struct rts_isp_i2c_reg g_gc8613_i2c_init_regs_fhd[] = {
+	//version b66419
+	//<MODE_2 type="01_GC8613_YA_MIPI2L_24M_1924x1084_30fps_raw10_linear">
+	//mclk 24MHz, mipiclk 504Mbps, wpclk 108.8MHz, rpclk 100.8MHz
+	//rowtime 27.57us, vts 1208
+	//darksun on, HDR off, fixposition off, DAG off
+	//基底曝光=3467ns
+
+	{0x03fe,0xf0},
+	{0x03fe,0x00},
+	{0x03fe,0x10},
+	{0x0a38,0x01},
+	{0x0a20,0x19},
+	{0x061b,0x17},
+	{0x061c,0x50},
+	{0x061d,0x06},
+	{0x061e,0x44},//87
+	{0x061f,0x05},
+	{0x0a21,0x10},
+	{0x0a28,0x00},
+	{0x0a30,0x00},
+	{0x0a31,0x7e},//fb
+	{0x0a34,0x40},
+	{0x0a35,0x08},
+	{0x0a37,0x46},
+	{0x0314,0x50},
+	{0x031c,0xce},
+	{0x0219,0x47},
+	{0x0342,0x02},//02
+	{0x0343,0xee},//ee
+	{0x0259,0x04},
+	{0x025a,0x00},
+	{0x0340,0x04},
+	{0x0341,0xb8},//b0
+	{0x0351,0x00},
+	{0x0345,0x02},
+	{0x0347,0x02},
+	{0x0348,0x0f},
+	{0x0349,0x10},
+	{0x034a,0x08},
+	{0x034b,0x88},
+	{0x034f,0xf0},
+	{0x0094,0x0f},
+	{0x0095,0x08},//00
+	{0x0096,0x08},
+	{0x0097,0x78},//70
+	{0x0099,0x05},//09
+	{0x009b,0x05},//09
+	{0x060c,0x0a},
+	{0x060e,0x20},
+	{0x060f,0x0f},
+	{0x070c,0x0a},
+	{0x070e,0x20},
+	{0x070f,0x0f},
+	{0x0087,0x50},
+	{0x141b,0x03},
+	{0x0907,0xd5},
+	{0x0909,0x06},
+	{0x0901,0x0e},
+	{0x0902,0x1b},
+	{0x0904,0x08},
+	{0x0908,0x09},
+	{0x0903,0xc5},
+	{0x090c,0x09},
+	{0x0905,0x10},
+	{0x0906,0x00},
+	{0x072a,0x7c},
+	{0x0724,0x2b},
+	{0x0727,0x2b},
+	{0x072b,0x1c},
+	{0x073e,0x40},
+	{0x0078,0x88},
+	{0x0618,0x01},
+	{0x1466,0x12},
+	{0x1468,0x07},
+	{0x1467,0x07},
+	{0x1478,0x07},
+	{0x1477,0x07},
+	{0x0709,0x40},
+	{0x0719,0x40},
+	{0x1469,0x80},
+	{0x146a,0x20},
+	{0x146b,0x03},
+	{0x1479,0x80},
+	{0x147a,0x20},
+	{0x147b,0x03},
+	{0x1480,0x02},
+	{0x1481,0x80},
+	{0x1482,0x02},
+	{0x1483,0x80},
+	{0x1484,0x08},
+	{0x1485,0xc0},
+	{0x1486,0x08},
+	{0x1487,0xc0},
+	{0x1407,0x10},
+	{0x1408,0x16},
+	{0x1409,0x03},
+	{0x1434,0x04},
+	{0x1447,0x75},
+	{0x140d,0x04},
+	{0x1461,0x10},
+	{0x146c,0x10},
+	{0x146d,0x10},
+	{0x146e,0x2e},
+	{0x146f,0x30},
+	{0x1474,0x34},
+	{0x1470,0x10},
+	{0x1471,0x13},
+	{0x143a,0x00},
+	{0x0220,0x80},
+	{0x024b,0x02},
+	{0x0245,0xc7},
+	{0x025b,0x07},
+	{0x02bb,0x77},
+	{0x0612,0x01},
+	{0x0613,0x26},
+	{0x0087,0x53},
+	{0x0089,0x02},
+	{0x0002,0xeb},
+	{0x005a,0x0c},
+	{0x0040,0x83},
+	{0x0075,0x58},
+	{0x0077,0x08},
+	{0x0218,0x10},
+	{0x0205,0x0c},
+	{0x0202,0x06},
+	{0x0203,0x27},
+	{0x061a,0x02},
+	{0x0122,0x0b},
+	{0x0123,0x30},
+	{0x0124,0x0b},
+	{0x0126,0x09},
+	{0x0129,0x0b},
+	{0x012a,0x16},
+	{0x012b,0x0a},
+	{0x03fe,0x00},
+	{0x0106,0x78},
+	{0x0136,0x00},
+	{0x0181,0xf0},
+	{0x0185,0x01},
+	{0x0180,0x46},
+	{0x0106,0x38},
+	{0x010d,0x65},//60
+	{0x010e,0x09},
+	{0x0113,0x02},
+	{0x0114,0x01},
+	{0x0100,0x09},
+	{0x0219,0x47},
+	{0x0054,0x98},
+	{0x0076,0x01},
+	{0x0052,0x02},
+	{0x021a,0x10},
+	{0x0430,0x10},
+	{0x0431,0x10},
+	{0x0432,0x10},
+	{0x0433,0x10},
+	{0x0434,0x6d},
+	{0x0435,0x6d},
+	{0x0436,0x6d},
+	{0x0437,0x6d},
+	{0x0704,0x03},
+	{0x0706,0x02},
+	{0x0716,0x02},
+	{0x0708,0xc8},
+	{0x0718,0xc8},
+	{0x071d,0xdc},
+	{0x071e,0x05},
+	//otp autoload
+	{0x031f,0x01},
+	{0x031f,0x00},
+	{0x0a67,0x80},
+	{0x0a54,0x0e},
+	{0x0a65,0x10},
+	{0x0a98,0x04},
+	{0x05be,0x00},
+	{0x05a9,0x01},
+	{0x0089,0x02},
+	{0x0aa0,0x00},
+	{0x0023,0x00},
+	{0x0022,0x00},
+	{0x0025,0x00},
+	{0x0024,0x00},
+	{0x0028,0x0f},
+	{0x0029,0x18},
+	{0x002a,0x08},
+	{0x002b,0x88},
+	{0x0317,0x1c},
+	{0x0a70,0x03},
+	{0x0a82,0x00},
+	{0x0a83,0xe0},
+	{0x0a71,0x00},
+	{0x0a72,0x02},
+	{0x0a73,0x60},
+	{0x0a75,0x41},
+	{0x0a70,0x03},
+	{0x0a5a,0x80},
+	
+	//sleep 20	
+	{0x0089,0x02},
+	{0x05be,0x01},
+	{0x0a70,0x00},
+	{0x0080,0x02},
+	{0x0a67,0x00},
+	{0x0058,0x00},
+	{0x0059,0x04},
+};
+static struct rts_isp_i2c_reg g_gc8613_i2c_init_regs_4k[] = {
+	//version b66419
+	//<MODE_2 type="06_GC8613_YA_MIPI2L_24M_3848x2168_15fps_raw10_linear">
+	//mclk 24MHz, mipiclk 720Mbps, wpclk 108MHz, rpclk 72MHz (72x2=144)
+	//rowtime 29.63us, vts 2250
+	//darksun on, HDR off, fixposition off, DAG off
+	//基底曝光=3467ns
+
+	{0x03fe,0xf0},
+	{0x03fe,0x00},
+	{0x03fe,0x10},
+	{0x0a38,0x01},
+	{0x0a20,0x19},
+	{0x061b,0x17},
+	{0x061c,0x50},
+	{0x061d,0x05},
+	{0x061e,0x2d},
+	{0x061f,0x05},
+	{0x0a21,0x30},
+	{0x0a30,0x00},
+	{0x0a31,0x5a},
+	{0x0a34,0x40},
+	{0x0a35,0x08},
+	{0x0a37,0x43},
+	{0x0314,0x50},
+	{0x0315,0x00},
+	{0x031c,0xce},
+	{0x0219,0x47},
+	{0x0342,0x03},
+	{0x0343,0x20},
+	{0x0259,0x08},
+	{0x025a,0x96},
+	{0x0340,0x08},
+	{0x0341,0xca},
+	{0x0351,0x00},
+	{0x0345,0x02},
+	{0x0347,0x02},
+	{0x0348,0x0f},
+	{0x0349,0x18},
+	{0x034a,0x08},
+	{0x034b,0x88},
+	{0x034f,0xf0},
+	{0x0094,0x0f},
+	{0x0095,0x08},
+	{0x0096,0x08},
+	{0x0097,0x78},
+	{0x0099,0x08},
+	{0x009b,0x08},
+	{0x060c,0x06},
+	{0x060e,0x20},
+	{0x060f,0x0f},
+	{0x070c,0x06},
+	{0x070e,0x20},
+	{0x070f,0x0f},
+	{0x0087,0x50},
+	{0x141b,0x03},
+	{0x0907,0xd5},
+	{0x0909,0x06},
+	{0x0901,0x0e},
+	{0x0902,0x0b},
+	{0x0904,0x08},
+	{0x0908,0x09},
+	{0x0903,0xc5},
+	{0x090c,0x09},
+	{0x0905,0x10},
+	{0x0906,0x00},
+	{0x072a,0x7c},
+	{0x0724,0x2b},
+	{0x0727,0x2b},
+	{0x072b,0x1c},
+	{0x073e,0x40},
+	{0x0078,0x88},
+	{0x0618,0x01},
+	{0x1466,0x12},
+	{0x1468,0x07},
+	{0x1467,0x07},
+	{0x0709,0x40},
+	{0x0719,0x40},
+	{0x1469,0x80},
+	{0x146a,0xc0},
+	{0x146b,0x03},
+	{0x1480,0x02},
+	{0x1481,0x80},
+	{0x1484,0x08},
+	{0x1485,0xc0},
+	{0x1430,0x80},
+	{0x1407,0x10},
+	{0x1408,0x16},
+	{0x1409,0x03},
+	{0x1434,0x04},
+	{0x1447,0x75},
+	{0x1470,0x10},
+	{0x1471,0x13},
+	{0x1438,0x00},
+	{0x143a,0x00},
+	{0x0220,0x80},
+	{0x024b,0x02},
+	{0x0245,0xc7},
+	{0x025b,0x07},
+	{0x02bb,0x77},
+	{0x0612,0x01},
+	{0x0613,0x26},
+	{0x0243,0x66},
+	{0x0087,0x53},
+	{0x0053,0x05},
+	{0x0089,0x02},
+	{0x0002,0xeb},
+	{0x005a,0x0c},
+	{0x0040,0x83},
+	{0x0075,0x54},
+	{0x0205,0x0c},
+	{0x0202,0x01},
+	{0x0203,0x27},
+	{0x061a,0x02},
+	{0x03fe,0x00},
+	{0x0106,0x78},
+	{0x0136,0x00},
+	{0x0181,0xf0},
+	{0x0185,0x01},
+	{0x0180,0x46},
+	{0x0106,0x38},
+	{0x010d,0xca},
+	{0x010e,0x12},
+	{0x0113,0x02},
+	{0x0114,0x01},
+	{0x0115,0x12},
+	{0x0122,0x11},	
+	{0x0123,0x40},	
+	{0x0126,0x0e},	
+	{0x0129,0x12},	
+	{0x012a,0x1a},	
+	{0x012b,0x0f},	
+	{0x0004,0x0f},
+	{0x0219,0x47},
+	{0x0054,0x98},
+	{0x0076,0x01},
+	{0x0052,0x02},
+	{0x021a,0x10},
+	{0x0430,0x10},
+	{0x0431,0x10},
+	{0x0432,0x10},
+	{0x0433,0x10},
+	{0x0434,0x6d},
+	{0x0435,0x6d},
+	{0x0436,0x6d},
+	{0x0437,0x6d},
+	{0x0704,0x03},
+	{0x0706,0x02},
+	{0x0716,0x02},
+	{0x0708,0xc8},
+	{0x0718,0xc8},
+	{0x071d,0xdc},
+	{0x071e,0x05},
+	
+	{0x031f,0x01},
+	{0x031f,0x00},
+	{0x0a67,0x80},
+	{0x0a54,0x0e},
+	{0x0a65,0x10},
+	{0x0a98,0x04},
+	{0x05be,0x00},
+	{0x05a9,0x01},
+	{0x0089,0x02},
+	{0x0aa0,0x00},
+	{0x0023,0x00},
+	{0x0022,0x00},
+	{0x0025,0x00},
+	{0x0024,0x00},
+	{0x0028,0x0f},
+	{0x0029,0x18},
+	{0x002a,0x08},
+	{0x002b,0x88},
+	{0x0317,0x1c},
+	{0x0a70,0x03},
+	{0x0a82,0x00},
+	{0x0a83,0xe0},
+	{0x0a71,0x00},
+	{0x0a72,0x02},
+	{0x0a73,0x60},
+	{0x0a75,0x41},
+	{0x0a70,0x03},
+	{0x0a5a,0x80},
+	//sleep 20	
+
+	{0x0089,0x02},
+	{0x05be,0x01},
+	{0x0a70,0x00},
+	{0x0080,0x02},
+	{0x0a67,0x00},
+	{0x0100,0x09},
+	{0x0058,0x00},
+	{0x0059,0x04},
+
+};
+
+static struct gc8613_gain_config g_gc8613_gain_config[] = {   
+ //  0614   0615   0225   1467   1468   00b8   00b9   1447
+	{0x00, 0x00, 0x00, 0x07, 0x07, 0x01, 0x00, 0x77,  64,},
+	{0x90, 0x02, 0x00, 0x07, 0x07, 0x01, 0x09, 0x77,  73,},
+	{0x01, 0x00, 0x00, 0x08, 0x08, 0x01, 0x19, 0x77,  89,},
+	{0x91, 0x02, 0x00, 0x08, 0x08, 0x01, 0x2A, 0x77, 107,},
+	{0x02, 0x00, 0x00, 0x09, 0x09, 0x01, 0x3D, 0x77, 126,},
+	{0x00, 0x00, 0x00, 0x07, 0x07, 0x02, 0x10, 0x75, 144,},
+	{0x90, 0x02, 0x00, 0x07, 0x07, 0x02, 0x29, 0x75, 170,},
+	{0x01, 0x00, 0x00, 0x08, 0x08, 0x03, 0x0B, 0x75, 204,},
+	{0x91, 0x02, 0x00, 0x08, 0x08, 0x03, 0x2F, 0x75, 239,},
+	{0x02, 0x00, 0x00, 0x08, 0x08, 0x04, 0x1C, 0x75, 284,},
+	{0x92, 0x02, 0x00, 0x09, 0x09, 0x05, 0x11, 0x75, 338,},
+	{0x03, 0x00, 0x00, 0x0a, 0x0a, 0x06, 0x20, 0x75, 416,},
+	{0x93, 0x02, 0x00, 0x0b, 0x0b, 0x07, 0x25, 0x75, 486,},
+	{0x00, 0x00, 0x01, 0x0c, 0x0c, 0x08, 0x1E, 0x75, 543,},
+	{0x90, 0x02, 0x01, 0x0d, 0x0d, 0x09, 0x3B, 0x75, 635,},
+	{0x01, 0x00, 0x01, 0x0d, 0x0d, 0x0B, 0x3B, 0x75, 763,},
+	{0x91, 0x02, 0x01, 0x0e, 0x0e, 0x0E, 0x03, 0x75, 899,},
+	{0x02, 0x00, 0x01, 0x0f, 0x0f, 0x10, 0x25, 0x75,1061,},
+	{0x92, 0x02, 0x01, 0x10, 0x10, 0x13, 0x35, 0x75,1270,},
+	{0x03, 0x00, 0x01, 0x11, 0x11, 0x17, 0x30, 0x75,1521,},
+	{0x93, 0x02, 0x01, 0x13, 0x13, 0x1C, 0x06, 0x75,1798,},
+	{0x04, 0x00, 0x01, 0x14, 0x14, 0x21, 0x07, 0x75,2119,},
+	{0x94, 0x02, 0x01, 0x15, 0x15, 0x27, 0x38, 0x75,2552,},
+	{0x05, 0x00, 0x01, 0x17, 0x17, 0x2F, 0x18, 0x75,3033,},
+	{0x95, 0x02, 0x01, 0x19, 0x19, 0x38, 0x09, 0x75,3593,},
+	{0x06, 0x00, 0x01, 0x1a, 0x1a, 0x41, 0x37, 0x75,4216,},
+};
+
+static int gc8613_get_info(uint32_t isp_id, struct rts_isp_sensor_info *info)
+{
+	int i;
+	struct rts_isp_snr_pwr *up = &info->power_up;
+	struct rts_isp_snr_pwr *down = &info->power_down;
+
+	if (isp_id >= SUPPORTED_ISP_NUM || !info)
+		return -RTS_ISP_EINVAL;
+
+	i = 0;
+	if (sensor_mode == BINNING_MODE) {
+		info->modes.mode[i].fps = g_gc8613_fps_info_fhd[0].fps;
+		info->modes.mode[i].hdr = LINEAR_MODE;//RTS_ISP_HDR_NONE;
+		info->modes.mode[i].size.w = 1920;
+		info->modes.mode[i].size.h = 1080;
+	}else{
+		info->modes.mode[i].fps = g_gc8613_fps_info_4k[0].fps;
+		info->modes.mode[i].hdr = LINEAR_MODE;//RTS_ISP_HDR_NONE;
+		info->modes.mode[i].size.w = 1920;
+		info->modes.mode[i].size.h = 1080;
+	}
+	i++;
+	info->modes.num = i;
+
+	info->i2c.i2c_id = 0x31;
+	info->i2c.addr_len = 2;
+	info->i2c.data_len = 1;
+
+
+	//g_status->hdr = LINEAR_MODE; //LINEAR_MODE, HDR_MODE
+	info->cur_hdr_mode = g_status->hdr;
+
+	i = 0;
+	set_power_item(&up->items[i++], SNR_PWRCTRL_GPIO, GPIO_LOW, 0);
+	set_power_item(&up->items[i++], SNR_HCLK, 0, 0);
+	set_power_item(&up->items[i++], SNR_RST_GPIO, GPIO_LOW, 0);
+	set_power_item(&up->items[i++], SNR_PWDN_GPIO, GPIO_LOW, 5000);
+	set_power_item(&up->items[i++], SNR_PWRCTRL_GPIO, GPIO_HIGH, 100);
+	set_power_item(&up->items[i++], SNR_HCLK, CLK_24M, 1000);
+	set_power_item(&up->items[i++], SNR_PWDN_GPIO, GPIO_HIGH, 1000);
+	set_power_item(&up->items[i++], SNR_RST_GPIO, GPIO_HIGH, 1000);
+	up->num = i;
+	i = 0;
+	set_power_item(&down->items[i++], SNR_RST_GPIO, 0, 10000);
+	set_power_item(&down->items[i++], SNR_PWDN_GPIO, 0, 100000);
+	set_power_item(&down->items[i++], SNR_HCLK, 0, 10000);
+	down->num = i;
+
+	return RTS_ISP_OK;
+}
+
+static const struct fps_info *gc8613_get_fps_info(uint16_t fps)
+{
+	int i;
+	if (sensor_mode == BINNING_MODE) {
+
+		for (i = 0; i < ARRAY_SIZE(g_gc8613_fps_info_fhd); i++)
+			if (fps == g_gc8613_fps_info_fhd[i].fps)
+				break;
+		if (i == ARRAY_SIZE(g_gc8613_fps_info_fhd))
+			return NULL;
+		return &g_gc8613_fps_info_fhd[i];
+	}
+	else{
+		for (i = 0; i < ARRAY_SIZE(g_gc8613_fps_info_4k); i++)
+			if (fps == g_gc8613_fps_info_4k[i].fps)
+				break;
+		if (i == ARRAY_SIZE(g_gc8613_fps_info_4k))
+			return NULL;
+		return &g_gc8613_fps_info_4k[i];
+
+	}
+}
+
+static int gc8613_get_init_info(uint32_t isp_id,
+				const struct rts_isp_sensor_mode *mode,
+				struct rts_isp_sensor_init_info *info)
+{
+	const struct fps_info *fps_info;
+	struct gc8613_status *status;
+
+	if (isp_id >= SUPPORTED_ISP_NUM || !info)
+		return -RTS_ISP_EINVAL;
+
+	status = &g_status[isp_id];
+	status->hdr = mode->hdr;
+
+	fps_info = gc8613_get_fps_info(mode->fps);
+	if (!fps_info)
+		return -RTS_ISP_EINVAL;
+
+	if (sensor_mode == BINNING_MODE) {
+		set_init_i2c_regs(info->sensor_regs[0], g_gc8613_i2c_init_regs_fhd, 0);
+
+		info->interface.interface = SNR_INTERFACE_MIPI;
+		info->interface.mipi.lanes = MIPI_LANE0 | MIPI_LANE1;
+		info->interface.mipi.hs_term = 0x5;
+		info->interface.type = RAW_SENSOR;
+		info->interface.bit_depth = SNR_10BIT;
+		info->mipi_behavor = NONE_HDR;
+
+		info->size.w = 1924;
+		info->size.h = 1084;
+		info->start.x = 1;
+		info->start.y = 0;
+
+		info->hts = fps_info->hts;
+		info->pclk = fps_info->clk;
+		info->min_vts = status->min_vts = fps_info->vts;
+		info->max_vts = 6750;
+
+		status->exp_step = 1e6 * info->hts / info->pclk; /* us  1e6 * 2781 / 100800000 = 27.57us*/
+	}
+	else{
+		set_init_i2c_regs(info->sensor_regs[0], g_gc8613_i2c_init_regs_4k, 0);
+
+		info->interface.interface = SNR_INTERFACE_MIPI;
+		info->interface.mipi.lanes = MIPI_LANE0 | MIPI_LANE1;
+		info->interface.mipi.hs_term = 0x5;
+		info->interface.type = RAW_SENSOR;
+		info->interface.bit_depth = SNR_10BIT;
+		info->mipi_behavor = NONE_HDR;
+
+		info->size.w = 1924;
+		info->size.h = 1084;
+		info->start.x = 1;
+		info->start.y = 0;
+
+		info->hts = fps_info->hts;
+		info->pclk = fps_info->clk;
+		info->min_vts = status->min_vts = fps_info->vts;
+		info->max_vts = 6750;
+
+		status->exp_step = 1e6 * info->hts / info->pclk; /* us  1e6 * 4266 / 144000000 =  29.63us*/
+	}
+
+	return RTS_ISP_OK;
+}
+
+static int gc8613_start(uint32_t isp_id)
+{
+	struct gc8613_status *status;
+
+	if (isp_id >= SUPPORTED_ISP_NUM)
+		return -RTS_ISP_EINVAL;
+
+	status = &g_status[isp_id];
+
+	status->last_exposure = 0;
+	//printf("Sensor timestamp: 2022/07/29 15:18\r\n");
+
+	return RTS_ISP_OK;
+}
+static int gc8613_get_exposure_range(uint32_t isp_id, uint32_t vts,
+					 float ratio[RTS_ISP_HDR_CHAN_MAX - 1],
+					 float min_exposure[RTS_ISP_HDR_CHAN_MAX],
+					 float max_exposure[RTS_ISP_HDR_CHAN_MAX])
+{
+	struct gc8613_status *status;
+
+	if (isp_id >= SUPPORTED_ISP_NUM)
+		return -RTS_ISP_EINVAL;
+
+	status = &g_status[isp_id];
+
+	min_exposure[0] = status->exp_step;
+	max_exposure[0] = (vts - 8) * status->exp_step;
+
+	debug("max_exposure = %f, min_exposure = %f\n", max_exposure[0], min_exposure[0]);
+	
+
+	return RTS_ISP_OK;
+}
+
+static uint16_t get_sensor_gain_reg(float fgain, struct gc8613_status *status)
+{
+	uint16_t sen_gain = (uint16_t)(fgain * 64.f);
+	int i;
+	
+	if (sen_gain >= (uint16_t)((float)ANALOG_GAIN_MAX_RATIO * 64.f)) 
+	{
+		sen_gain = (uint16_t)((float)ANALOG_GAIN_MAX_RATIO * 64.f);
+		status->gain_reg_num = (uint8_t)(ARRAY_SIZE(g_gc8613_gain_config) - 1);
+	} 
+	else 
+	{
+		for (i = 0; i < ARRAY_SIZE(g_gc8613_gain_config) - 1; i++) 
+		{
+			if (sen_gain >= g_gc8613_gain_config[i].gain_value &&
+			    sen_gain < g_gc8613_gain_config[i + 1].gain_value) 
+			{
+				sen_gain = g_gc8613_gain_config[i].gain_value;
+				status->gain_reg_num = i;
+				break;
+			}
+		}
+	}
+	debug("GAIN INFO fgatin=%f, gain reg num=%d\n", fgain, status->gain_reg_num);
+
+	return sen_gain;
+
+}
+
+static float get_sensor_real_gain(uint16_t reg_value)
+{
+	return reg_value / 64.0f;
+}
+
+static int gc8613_get_tuned_again(uint32_t isp_id,
+				  float again[RTS_ISP_HDR_CHAN_MAX])
+{
+	int gain_reg;
+	struct gc8613_status *status;
+
+	if (isp_id >= SUPPORTED_ISP_NUM || !again)
+		return -RTS_ISP_EINVAL;
+
+	status = &g_status[isp_id];
+
+	gain_reg = get_sensor_gain_reg(again[0], status);
+	again[0] = get_sensor_real_gain(gain_reg);
+
+	return RTS_ISP_OK;
+}
+
+static int gc8613_get_tuned_dgain(uint32_t isp_id,
+				  float dgain[RTS_ISP_HDR_CHAN_MAX])
+{
+	if (isp_id >= SUPPORTED_ISP_NUM || !dgain)
+		return -RTS_ISP_EINVAL;
+
+	dgain[0] = 1.0f;
+
+	return RTS_ISP_OK;
+}
+
+static int gc8613_get_exposure_gain_info(uint32_t isp_id,
+					 const struct rts_isp_sensor_exp_gain *exp_gain,
+					 struct rts_isp_sync_regs *regs)
+{
+	int i;
+	struct gc8613_status *status;
+	struct rts_isp_sync_reg *reg;
+	uint16_t exposure_rows, frame_length;
+
+	if (isp_id >= SUPPORTED_ISP_NUM || !exp_gain || !regs)
+		return -RTS_ISP_EINVAL;
+
+	status = &g_status[isp_id];
+	frame_length = exp_gain->vts;
+	reg = regs->reg;
+
+	i = 0;
+
+	/* set exposure */	
+	if (abs(status->last_exposure - exp_gain->exposure[0]) > 0.001f) {
+		exposure_rows = exp_gain->exposure[0] / status->exp_step + 0.5f;
+		set_sync_i2c(&reg[i++], 0x0202, exposure_rows >> 8);
+		set_sync_i2c(&reg[i++], 0x0204, exposure_rows & 0xff);
+		status->last_exposure = exp_gain->exposure[0];
+	}
+
+	/* set vts */
+	if (abs(status->last_vts - frame_length) > 0.001f) {
+		set_sync_i2c(&reg[i++], 0x0340, frame_length >> 8);
+		set_sync_i2c(&reg[i++], 0x0341, frame_length & 0xff);
+
+		status->last_vts = frame_length;
+	}
+	status->gain_reg_num;
+	
+	/* set gain */
+	if (abs(status->last_gain_reg_num - status->gain_reg_num) > 0.001f) {
+		set_sync_i2c(&reg[i++], 0x031d, 0x2d);
+		set_sync_i2c(&reg[i++], 0x0614, g_gc8613_gain_config[status->gain_reg_num].reg_0614);
+		set_sync_i2c(&reg[i++], 0x0615, g_gc8613_gain_config[status->gain_reg_num].reg_0615);
+		set_sync_i2c(&reg[i++], 0x031d, 0x28);
+		set_sync_i2c(&reg[i++], 0x0225, g_gc8613_gain_config[status->gain_reg_num].reg_0225);
+		set_sync_i2c(&reg[i++], 0x1467, g_gc8613_gain_config[status->gain_reg_num].reg_1467);
+		set_sync_i2c(&reg[i++], 0x1468, g_gc8613_gain_config[status->gain_reg_num].reg_1468);
+		set_sync_i2c(&reg[i++], 0x00b8, g_gc8613_gain_config[status->gain_reg_num].reg_00b8);
+		set_sync_i2c(&reg[i++], 0x00b9, g_gc8613_gain_config[status->gain_reg_num].reg_00b9);
+		set_sync_i2c(&reg[i++], 0x1447, g_gc8613_gain_config[status->gain_reg_num].reg_1447);
+
+		status->last_gain_reg_num = status->gain_reg_num;
+	}
+	regs->num = i;
+	
+	return RTS_ISP_OK;
+}
+static int gc8613_set_mirror_flip(uint32_t isp_id,
+								  struct rts_isp_sensor_mirror_flip *mf_info)
+{
+	int i;
+	uint16_t bySnrImgDir;
+	struct rts_isp_sync_reg *reg;
+
+	bySnrImgDir = mf_info->mirror_en != 0;
+	bySnrImgDir = (mf_info->flip_en != 0) << 1 | bySnrImgDir;
+	mf_info->delay_frames = 1;
+
+	i = 0;
+	reg = mf_info->regs.reg;
+	switch(bySnrImgDir)//
+	{
+		case 0: // Normal
+		default:
+			set_sync_i2c(&reg[i++], 0x0063, 0x00);
+			set_sync_i2c(&reg[i++], 0x022c, 0x00);
+		break;
+		case 1: // Mirror
+			set_sync_i2c(&reg[i++], 0x0063, 0x05);
+			set_sync_i2c(&reg[i++], 0x022c, 0x00);
+		break;
+		case 2: // VFlip
+			set_sync_i2c(&reg[i++], 0x0063, 0x02);
+			set_sync_i2c(&reg[i++], 0x022c, 0x01);
+		break;
+		case 3: // Rotate
+			set_sync_i2c(&reg[i++], 0x0063, 0x05);
+			set_sync_i2c(&reg[i++], 0x022c, 0x01);
+		break;
+
+	}
+	mf_info->regs.num = i;
+	return RTS_ISP_OK;
+}
+
+static int gc8613_check(uint32_t isp_id)
+{
+	int ret;
+	int id;
+	struct rts_isp_i2c_reg reg;
+
+    rts_isp_sensor_access_prepare();
+
+	reg.addr = 0x03f0;
+	ret = rts_isp_read_sensor_reg(isp_id, &reg);
+	if (ret) {
+	    rts_isp_sensor_access_unprepare();
+		return ret;
+	}
+	id = reg.data << 8;
+
+	reg.addr = 0x03f1;
+	ret = rts_isp_read_sensor_reg(isp_id, &reg);
+
+    rts_isp_sensor_access_unprepare();
+
+	if (ret)
+		return ret;
+	id |= reg.data;
+
+
+	printf("@#@ gc8613_check id = 0x%x\n",id);
+	if (id == 0x8613)
+		return RTS_ISP_OK;
+	else
+		return -RTS_ISP_EINVAL;
+}
+
+static const struct rts_isp_sensor_ops gc8613_ops = {
+	.ops_version = SENSOR_OPS_VERSION,
+	.name = "gc8613",
+
+	.get_info = gc8613_get_info,
+	.get_init_info = gc8613_get_init_info,
+	.start = gc8613_start,
+	.get_exposure_range = gc8613_get_exposure_range,
+	.get_tuned_again = gc8613_get_tuned_again,
+	.get_tuned_dgain = gc8613_get_tuned_dgain,
+	.get_exposure_gain_info = gc8613_get_exposure_gain_info,
+	.set_mirror_flip = gc8613_set_mirror_flip,
+	.check = gc8613_check,
+
+};
+
+
+const struct rts_isp_sensor_ops *rts_isp_get_sensor_ops(void)
+{
+	return &gc8613_ops;
+}
+
+//#endif
+
+
