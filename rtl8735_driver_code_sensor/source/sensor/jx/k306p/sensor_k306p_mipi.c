@@ -20,7 +20,7 @@
 #define SHORT_EXP_SHIFT_MAX 69
 //#define SHORT_LSB_EXP_MAX 234
 //#define SHORT_EXP_MAX 475
-#define SHORT_EXP_MAX 		63
+#define SHORT_EXP_MAX 		62
 #define PROJECT_FL			1
 #define ORIENTATION			0	/* Default sensor mirror and flip mode => 0:default, 1:rotate180 */
 #define MAX_GAIN_USAGE		0	/* 0=15.75x, 1=31x */
@@ -316,7 +316,7 @@ static struct rts_isp_i2c_reg g_k306p_i2c_init_regs_hdr[] = {
 	{0x19,0x20},
 	{0x1B,0x4F},
 	{0x07,0x43},
-	{0x06,0x10},//0x23
+	{0x06,0x0d},//0x23 0x10
 	{0x03,0xFF},
 	{0x04,0xFF},
 	{0xBF,0x01},
@@ -688,7 +688,9 @@ static int k306p_get_init_info(uint32_t isp_id,
 		return -RTS_ISP_EINVAL;
 
 	if (mode->hdr == HDR_MODE) {
+		printf("k306p_get_init_info HDR_2K_MODE\n");
 		set_init_i2c_regs(info->sensor_regs[0], g_k306p_i2c_init_regs_hdr, 0);
+
 		info->interface.interface = SNR_INTERFACE_MIPI;
 		info->interface.mipi.lanes = MIPI_LANE0 | MIPI_LANE1;
 		info->interface.mipi.hs_term = 0x3;
@@ -717,16 +719,20 @@ static int k306p_get_init_info(uint32_t isp_id,
 		info->mipi_behavor = NONE_HDR;
 
 	#if !BINNING_MODE
-		info->size.w = 2568;
-		info->size.h = 1448;
+		//info->size.w = 2568;
+		//info->size.h = 1448;
+		info->size.w = 2564;
+		info->size.h = 1444;
 		info->start.x = 0;
 		info->start.y = 1;
+		printf("k306p_get_init_info LINEAR_2K_MODE\n");
 		set_init_i2c_regs(info->sensor_regs[0], g_k306p_i2c_init_regs_linear, 0);
 	#else
 		info->size.w = 1284;
 		info->size.h = 726;
 		info->start.x = 0;
 		info->start.y = 1;
+		printf("k306p_get_init_info LINEAR_BINNING_MODE\n");
 		set_init_i2c_regs(info->sensor_regs[0], g_k306p_i2c_init_regs_asic_bin_mode, 0);
 	#endif
 		info->hts = fps_info->hts;
@@ -811,11 +817,16 @@ static uint16_t get_sensor_gain_reg(float fAGain, struct k306p_status *status)
 	else if(fAGain>=8.0 && fAGain<16){
 		wAgainReg = (int)(2.0f*(fAGain-8.0) + 48.0);
 	}
+#if(MAX_GAIN_USAGE)
 	else if(fAGain>=16.0 && fAGain<32) {
 		wAgainReg = (int)((fAGain-16.0) + 64.0);
 	}
 	else 
 		wAgainReg = 0x4f;
+#else
+	else 
+		wAgainReg = 0x3f;
+#endif
 		
 	status->num = wAgainReg;
 	return wAgainReg;
@@ -837,9 +848,11 @@ static float get_sensor_real_gain(uint16_t wAGain)
 	else if(wAGain>=48 && wAGain<64){
 		fAgainReg = (float)(ftemp/2.0 - 16);
 	}
+#if(MAX_GAIN_USAGE)
 	else if(wAGain>=64 && wAGain<80){
 		fAgainReg = (float)(ftemp - 48);
 	}
+#endif
 	return (fAgainReg);
 }
 
@@ -941,7 +954,7 @@ static int k306p_get_exposure_gain_info(uint32_t isp_id,
 			else{
 			//	set_sync_i2c(&reg[i++], 0x08, (exposure_rows[1] >> 8) & 0x01 );
 				set_sync_i2c(&reg[i++], 0x05,  exposure_rows[1] & 0xff);
-				set_sync_i2c(&reg[i++], 0x06, (exposure_rows[1] & 0xff)+6);
+				set_sync_i2c(&reg[i++], 0x06, (exposure_rows[1] & 0xff)+7);
 			}
 			status->last_exposure[1] = exp_gain->exposure[1];
 		}

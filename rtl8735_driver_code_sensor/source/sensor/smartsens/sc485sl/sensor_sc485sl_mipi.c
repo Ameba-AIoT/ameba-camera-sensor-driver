@@ -22,12 +22,11 @@
 #define SUPPORTED_ISP_NUM 1
 #define RTS_ISP_HDR_CHAN_MAX 2
 #define interval_between_long_short 196
-
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 #define abs(x) ((x) >= 0 ? (x) : -(x))
 #define ORIENTATION 0	//0=default, 1=rotate180
-
 #define ANALOG_GAIN_MAX_RATIO 107.415f
+#define ROW_TIME_ADJUST	1	//0 = default(16.66us), 1=25us
 
 struct fps_info {
 	float fps;
@@ -62,8 +61,13 @@ static const struct fps_info g_sc485sl_fps_info_asic_linear_2lane[] = {
 	{30, 3000, 1600, 144000000},
 };
 #endif
+
 static const struct fps_info g_sc485sl_fps_info_asic_linear_4lane[] = {
+#if ROW_TIME_ADJUST
+	{30, 4500, 1600, 216000000},
+#else
 	{30, 3306, 2000, 198400000},
+#endif
 };
 
 static const struct fps_info g_sc485sl_fps_info_asic_hdr_4lane[] = {
@@ -410,13 +414,20 @@ static struct rts_isp_i2c_reg g_sc485sl_i2c_init_regs_asic_linear_4lane[] = {
 		{0x3206,0x05},
 		{0x3207,0xff},
 		{0x3208,0x0a},//Active x = 2560		//0xa80
-		{0x3209,0x00},
-		{0x320a,0x05},//Active y = 1440		//0x5f0
-		{0x320b,0xa0},
-		{0x320c,0x03},
-		{0x320d,0x84},
+		{0x3209,0x08},	//00
+		{0x320a,0x05}, //Active y = 1440		//0x5f0
+		{0x320b,0xa8},	//a0
+	#if ROW_TIME_ADJUST
+		{0x320c,0x04},	//0x03
+		{0x320d,0x65},	//0x84
+		{0x320e,0x06},
+		{0x320f,0x40},
+	#else
+		{0x320c,0x03},	//0x03
+		{0x320d,0x84},	//0x84
 		{0x320e,0x07},
 		{0x320f,0xd0},
+	#endif
 		{0x3211,0x48},//start x = 8+64
 		{0x3213,0x31},//start y = 8+40+1
 		{0x3214,0x11},
@@ -1305,8 +1316,8 @@ static int sc485sl_get_init_info(uint32_t isp_id,
 		info->interface.bit_depth = SNR_10BIT;
 		info->mipi_behavor = NONE_HDR;
 
-		info->size.w = 2560;
-		info->size.h = 1440;
+		info->size.w = 2568;
+		info->size.h = 1448;
 		info->start.x = 0;
 		info->start.y = 0;
 
