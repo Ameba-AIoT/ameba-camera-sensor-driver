@@ -1,6 +1,9 @@
 
 
 
+SHA-1: 0ac32848076caa5dcab34398024fc6fcb594ecb8
+* [sensor] Update Makefile
+
 SHA-1: 947d87716ba8f57bd8617a20b20b117e84b54a06
 * [voe] update voe 1710
 
